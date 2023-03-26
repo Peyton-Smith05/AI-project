@@ -39,6 +39,8 @@
 
 ## Implemenation
 
+* Running main.py runs the cml version of the code, running game.py runs the GUI of the code however that is not complete yet
+
 ### Board Class
 
 * Variables: 
@@ -67,6 +69,13 @@
 
 	* ``checkForCheck(move: move.Move, turn: char)``: Helper function that analyzes a move and looks a half move further to see if that move puts themselves in check. Returns bool.
 
+### Move Class
+
+* Variables
+	
+	* start: {int} integer position of piece with in 1d state array
+	
+	* target: {int} integer position of target square within 1d state array
 
 ## Notes
 
