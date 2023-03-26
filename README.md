@@ -36,3 +36,50 @@
     * Cannon: C/c
     * Horse/Knight: H/h
     * Pawn: P/p
+
+## Implemenation
+
+### Board Class
+
+* Variables: 
+
+	* ``state``: {1d Char Array} containing piece positions
+
+	* ``valid_moves``: {array of Moves} contains list of valid moves of the current players turn
+
+	* ``turn``: {char} w | b
+
+	* ``computer_color``: {char} w | b
+
+	* ``king_pos`` {int} integer position of the turn of current players king within state
+                     (this will be needed for determining legal moves)
+	* ``half_moves`` {int} number of half moves since last capture. If == 60 then game ends in draw, increments after white or black move
+
+	* ``full_moves`` {int} number of full moves
+
+* Functions
+
+	* ``__init__(self, fen)``: default constructor from fen. Uses fen to initialize all board variables
+	
+	* ``generateValidMoves()``: analyzes state and generates ``valid_moves``
+
+	* ``updateBoardFromMove(move: move.Move)``: updates ``state`` from ``move``
+
+	* ``checkForCheck(move: move.Move, turn: char)``: Helper function that analyzes a move and looks a half move further to see if that move puts themselves in check. Returns bool.
+
+
+## Notes
+
+* In ``updateBoardFromMove()`` need to increment halfmove counter and full move counter
+
+* In main game loop need to check for draw with halfmove counter
+
+
+
+
+
+
+
+
+
+

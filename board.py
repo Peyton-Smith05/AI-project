@@ -21,6 +21,8 @@ FEN Notation:
 
 """
 
+import move
+
 """
 
 @:var state {array[90] of char} contains current state of board
@@ -32,9 +34,15 @@ FEN Notation:
 @:var full_moves {int} number of full moves
 
 @:func __init__(self, fen) default constructor, calls helper function generateStringFromFen()
-@:func generateStringFromFen(string fen) 
-@:func generateValidMoves(1darray board
+
+TODO:
+
+@:func generateValidMoves()
 @:func evaluateBoardPos()
+@:func checkForCheck(move: move.Move, turn: char): Helper function that analyzes a move and looks a half move further 
+                                                   to see if that move puts themselves in check. Returns bool.
+@:func validateMove(m: move.Move): General function to check if the move is psuedo legal
+
 
 """
 
@@ -58,6 +66,9 @@ class Board:
         parse = fen.split(" ")
 
         board_rows = parse[0]
+
+        # Reverse inorder to match list order with rank and file system
+        board_rows = board_rows[::-1]
 
         # Getting piece positions
         for x in range(len(board_rows)):
@@ -100,3 +111,19 @@ class Board:
             board_str += "Black to move"
 
         return board_str
+
+    def updateBoardFromMove(self, m: move.Move):
+
+        # TODO: Validate move??
+
+        # Swap places in list
+        self.state[m.target] = self.state[m.start]
+        self.state[m.start] = '+'
+
+        # Update Turn
+        if self.turn == 'w':
+            self.turn = 'b'
+        else:
+            self.turn = 'w'
+
+
