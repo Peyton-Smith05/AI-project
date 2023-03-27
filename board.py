@@ -49,7 +49,7 @@ TODO:
 
 class Board:
     """
-    Constructor from fun
+    Constructor from fen
     @:param fen {string} fen string that indicates the piece state, turn, and full move counter 
     @:return state {1d char array}, turn {bool}, half_moves {int}, and full_moves {int}
     """
@@ -125,5 +125,19 @@ class Board:
             self.turn = 'b'
         else:
             self.turn = 'w'
+
+    def generateValidMoves(self, file, rank):
+        """
+        Given a single piece location, generate a list of pseudo-legal moves
+        :@param file {int} vertical line on board, range={1..9}
+        :@param rank {int} horizontal line on board, range={1..10}
+        """
+
+        # Identify given piece
+        piece = self.state[(rank-1)*9 + (file-1)]
+        print(piece)
+
+
+
 
 
