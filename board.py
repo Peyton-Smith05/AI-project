@@ -131,8 +131,16 @@ class Board:
         else:
             self.turn = 'w'
 
-    def isOccupied(self, file, rank):
-        return self.state[(rank-1)*9 + (file-1)] != "+"
+    def isOccupied(self, file, rank, piece):
+        # print(file, rank)
+        occupier = self.state[(rank-1)*9 + (file-1)]
+        if occupier != "+":
+            occupied = True
+            friendly = occupier.islower() == piece.islower()
+        else:
+            occupied = False
+            friendly = False
+        return occupied, friendly
 
     def generateValidMoves(self, file, rank):
         """
@@ -167,12 +175,18 @@ class Board:
         for vector_sequence in vectors:
 
             new_file, new_rank = file, rank
-            outside = False
-            occupied = False
+
+            # Whether the last considered move should be disqualified
+            disqualified = False
+            # Whether the current sequence of move should be stopped
+            # e.g. If way obstructed, do not consider the remaining positions
+            halt = False
+
+            capture = False
             should_advance = True
             
             # This loop allows to model moves of any distance along an axis
-            while should_advance and not outside and not occupied:
+            while should_advance and not halt:
 
                 # For all pieces, apart for Horse this will run once
                 # (Horse has a two-stage move)
@@ -185,21 +199,44 @@ class Board:
                     # 2. Check if new location is within bounds
                     if not (min_file <= new_file <= max_file) or not (min_rank <= new_rank <= max_rank):
                         # Outside the bounding area, check next option
-                        outside = True
+                        disqualified = True
+                        halt = True
                         break
 
                     # 3. Check if new location is occupied
-                    occupied = self.isOccupied(new_file, new_rank)
+                    occupied, friendly = self.isOccupied(new_file, new_rank, unknown_piece)
+
+                    # Occupied by friendly piece
+                    if occupied and friendly:
+                        disqualified = True
+                        halt = True
+                        break
+                    # Occupied by opponent piece, is a single-step move, and piece is not Cannon
+                    elif occupied and vector == vector_sequence[-1] and piece != Cannon:
+                        disqualified = False
+                        capture = True
+                        halt = True
+                    # Occupied by opponent piece and is the first-step of a two-step Horse move
+                    elif occupied:
+                        disqualified = True
+                        halt = True
+                        break
 
                 # 4. Create a move and add to list
-                if not occupied and not outside:
-                    move = Move((file, rank), (new_file, new_rank))
+                if not disqualified:
+                    move = Move((file, rank), (new_file, new_rank), capture)
                     print(move)
                     moves.append(move)
 
                 # If the given piece can move any distance along an axis (e.g. Cannon or Rook)
                 # the loop should continue until an obstruction is encountered or end of board reached
                 should_advance = any_dist
+
+            # Special Case: Cannon Capture
+            # If halted, and not reached end of board, 
+            # Cannon has encountered a piece it can use as a 'platform'
+            # Check if there is an opponent piece on the axis past the 'platform'
+            # TODO: cannon_capture()
 
         return moves
             
