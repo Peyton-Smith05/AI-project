@@ -13,3 +13,6 @@ class Move:
         self.target = target
         self.start = start
         self.pos_eval = 0
+
+    def __str__(self):
+        return "Move from " + str(self.start) + " to " + str(self.target)

@@ -21,7 +21,8 @@ FEN Notation:
 
 """
 
-import move
+from move import Move
+from piece import *
 
 """
 
@@ -45,6 +46,10 @@ TODO:
 
 
 """
+
+# Mapping letters stored in Board state to Piece classes
+PIECE_MAPPING = { "K":King, "A":Advisor, "E":Elephant, "H":Horse,
+                  "R":Rook, "C":Cannon, "P":Pawn }
 
 
 class Board:
@@ -112,7 +117,7 @@ class Board:
 
         return board_str
 
-    def updateBoardFromMove(self, m: move.Move):
+    def updateBoardFromMove(self, m: Move):
 
         # TODO: Validate move??
 
@@ -126,12 +131,84 @@ class Board:
         else:
             self.turn = 'w'
 
+    def isOccupied(self, file, rank):
+        return self.state[(rank-1)*9 + (file-1)] != "+"
+
     def generateValidMoves(self, file, rank):
         """
         Given a single piece location, generate a list of pseudo-legal moves
         :@param file {int} vertical line on board, range={1..9}
         :@param rank {int} horizontal line on board, range={1..10}
+
+        TODO: Account for special capture movement of Cannon
+        TODO: Check for check and prevent movements
+        TODO: Check for two kings facing each other directly
         """
+
+        # List of pseudo-random moves
+        moves = []
+
+        # Identify piece occupying given location
+        unknown_piece = self.state[(rank-1)*9 + (file-1)]
+        piece = PIECE_MAPPING[unknown_piece.upper()]
+
+        # Get the movement specification of the given piece
+        vectors, any_dist, area = piece.get_move_vectors(self, file, rank, unknown_piece.islower())
+        
+        # Check the bounding area for the given piece
+        if area is not None:
+            min_file, max_file = area[0]
+            min_rank, max_rank = area[1]
+        else:
+            min_file, max_file = 1, 9
+            min_rank, max_rank = 1, 10
+
+        # Generate pseudo-legal moves
+        for vector_sequence in vectors:
+
+            new_file, new_rank = file, rank
+            outside = False
+            occupied = False
+            should_advance = True
+            
+            # This loop allows to model moves of any distance along an axis
+            while should_advance and not outside and not occupied:
+
+                # For all pieces, apart for Horse this will run once
+                # (Horse has a two-stage move)
+                for vector in vector_sequence:
+
+                    # 1. Compute resulting new position
+                    new_file += vector[0]
+                    new_rank += vector[1]
+                    
+                    # 2. Check if new location is within bounds
+                    if not (min_file <= new_file <= max_file) or not (min_rank <= new_rank <= max_rank):
+                        # Outside the bounding area, check next option
+                        outside = True
+                        break
+
+                    # 3. Check if new location is occupied
+                    occupied = self.isOccupied(new_file, new_rank)
+
+                # 4. Create a move and add to list
+                if not occupied and not outside:
+                    move = Move((file, rank), (new_file, new_rank))
+                    print(move)
+                    moves.append(move)
+
+                # If the given piece can move any distance along an axis (e.g. Cannon or Rook)
+                # the loop should continue until an obstruction is encountered or end of board reached
+                should_advance = any_dist
+
+        return moves
+            
+
+
+
+
+        
+
 
 
 

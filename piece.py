@@ -4,6 +4,8 @@ class Piece(ABC):
     """
     Abstract class for a piece.
     Each piece inherits from the class and implements methods below.
+
+    All methods are static, meaning that no objects have to be instantiated saving on runtime and memory.
     """
     
     @staticmethod
@@ -32,7 +34,7 @@ class Piece(ABC):
 
 class King(Piece):
     # Orthogonal movements
-    move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(-1,0)]]
+    move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(0,-1)]]
 
     @staticmethod
     def get_move_vectors(board, file, rank, red_side):
@@ -82,7 +84,7 @@ class Horse(Piece):
 
 class Rook(Piece):
     # Any orthogonal movement
-    move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(-1,0)]]
+    move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(0,-1)]]
 
     @staticmethod
     def get_move_vectors(board, file, rank, red_side):
@@ -91,7 +93,7 @@ class Rook(Piece):
 class Cannon(Piece):
     # Any orthogonal movement
     # TODO: Add special case for capture
-    move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(-1,0)]]
+    move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(0,-1)]]
 
     @staticmethod
     def get_move_vectors(board, file, rank, red_side):
@@ -121,7 +123,3 @@ class Pawn(Piece):
                 move_vectors = [[(0,1)]]
 
         return move_vectors, False, None
-
-
-
-    
