@@ -133,9 +133,7 @@ class Board:
         :@param rank {int} horizontal line on board, range={1..10}
         """
 
-        # Identify given piece
-        piece = self.state[(rank-1)*9 + (file-1)]
-        print(piece)
+
 
 
 

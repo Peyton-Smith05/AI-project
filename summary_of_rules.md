@@ -4,7 +4,7 @@
 * 9 Files (Vertical Lines)
 * 10 Ranks (Horizontal Lines)
 * River along rank 5 and 6
-* Palace at (4-6, 1-3) for black and (3-6, 8-10) for red/white
+* Palace at (4-6, 1-3) for black and (4-6, 8-10) for red/white
 
 ## Pieces
 
