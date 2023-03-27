@@ -22,7 +22,7 @@ class Piece(ABC):
         1. For single-step pieces - a list of singleton lists of tuples representing movement vectors, or
         2. For double-step pieces (e.g. Horse) - a list of lists of two tuples representing subsequent movement vectors.
 
-        :return any_dist {bool} can the piece move any distance along the specified vector
+        :@return any_dist {bool} can the piece move any distance along the specified vector
 
         :@return area {[(int, int), (int, int)]} allowed movement area for a given piece in the form [(min_file, max_file), (min_rank, max_rank)] 
         """
@@ -92,7 +92,6 @@ class Rook(Piece):
 
 class Cannon(Piece):
     # Any orthogonal movement
-    # TODO: Add special case for capture
     move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(0,-1)]]
 
     @staticmethod

@@ -155,6 +155,8 @@ class Board:
         Given a single piece location, generate a list of pseudo-legal moves
         :@param file {int} vertical line on board, range={1..9}
         :@param rank {int} horizontal line on board, range={1..10}
+
+        :@return moves {[Move]} list of pseudo-legal moves
         """
 
         # List of pseudo-legal moves
