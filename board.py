@@ -132,7 +132,6 @@ class Board:
             self.turn = 'w'
 
     def isOccupied(self, file, rank, piece):
-        # print(file, rank)
         occupier = self.state[(rank-1)*9 + (file-1)]
         if occupier != "+":
             occupied = True
@@ -142,18 +141,23 @@ class Board:
             friendly = False
         return occupied, friendly
 
+
     def generateValidMoves(self, file, rank):
+        moves = self.generatePseudoValidMoves(file, rank)
+        # TODO: Check for check and prevent movements
+        # e.g. moves = filter(moves, causes_check())
+        # TODO: Check for two kings facing each other directly
+        # e.g. moves = filter(moves, kings_facing())
+        return moves
+
+    def generatePseudoValidMoves(self, file, rank):
         """
         Given a single piece location, generate a list of pseudo-legal moves
         :@param file {int} vertical line on board, range={1..9}
         :@param rank {int} horizontal line on board, range={1..10}
-
-        TODO: Account for special capture movement of Cannon
-        TODO: Check for check and prevent movements
-        TODO: Check for two kings facing each other directly
         """
 
-        # List of pseudo-random moves
+        # List of pseudo-legal moves
         moves = []
 
         # Identify piece occupying given location
@@ -183,6 +187,7 @@ class Board:
             halt = False
 
             capture = False
+            cannon_platform = False
             should_advance = True
             
             # This loop allows to model moves of any distance along an axis
@@ -210,7 +215,6 @@ class Board:
                     if occupied and friendly:
                         disqualified = True
                         halt = True
-                        break
                     # Occupied by opponent piece, is a single-step move, and piece is not Cannon
                     elif occupied and vector == vector_sequence[-1] and piece != Cannon:
                         disqualified = False
@@ -220,6 +224,26 @@ class Board:
                     elif occupied:
                         disqualified = True
                         halt = True
+
+                    # Special Case: Cannon Capture
+                    # If halted, and not reached end of board, 
+                    # Cannon has encountered a piece it can use as a 'platform'
+                    # Check if there is an opponent piece on the axis past the 'platform'
+                    if piece == Cannon and occupied:
+                        # Cannon platform encountered
+                        if not cannon_platform:
+                            cannon_platform = True
+                            halt = False
+                        # Enemy piece encountered after platform, can capture
+                        elif cannon_platform and not friendly:
+                            disqualified = False
+                            capture = True
+                            halt = True
+                    # Cannon cannot move past obstruction, only capture
+                    elif piece == Cannon and cannon_platform:
+                        disqualified = True
+
+                    if disqualified:
                         break
 
                 # 4. Create a move and add to list
@@ -228,15 +252,10 @@ class Board:
                     print(move)
                     moves.append(move)
 
+
                 # If the given piece can move any distance along an axis (e.g. Cannon or Rook)
                 # the loop should continue until an obstruction is encountered or end of board reached
                 should_advance = any_dist
-
-            # Special Case: Cannon Capture
-            # If halted, and not reached end of board, 
-            # Cannon has encountered a piece it can use as a 'platform'
-            # Check if there is an opponent piece on the axis past the 'platform'
-            # TODO: cannon_capture()
 
         return moves
             
