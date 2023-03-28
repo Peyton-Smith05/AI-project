@@ -42,12 +42,15 @@ from copy import deepcopy
 
 TODO:
 
-@:func generateValidMoves()
 @:func evaluateBoardPos()
-@:func checkForCheck(move: move.Move, turn: char): Helper function that analyzes a move and looks a half move further 
-                                                   to see if that move puts themselves in check. Returns bool.
-@:func validateMove(m: move.Move): General function to check if the move is psuedo legal
 
+@:func validateMove(m: move.Move): General function to check if the move is psuedo legal - This can probably be dealt with by comparing user input to the output of generateValidMoves()
+
+@:func checkForGameEnd()
+Check the current board to see if game has ended:
+1. Check-mate - is_check() and all valid moves cause check also
+2. Repeated move three times
+3. Set number of turns passed
 
 """
 
