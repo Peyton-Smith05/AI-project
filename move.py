@@ -9,7 +9,11 @@ class Move - Essentially a struct for storing move data
 
 
 class Move:
-    def __init__(self, start, target):
+    def __init__(self, start, target, capture=False):
         self.target = target
         self.start = start
+        self.capture = capture
         self.pos_eval = 0
+
+    def __str__(self):
+        return "Move from " + str(self.start) + " to " + str(self.target)

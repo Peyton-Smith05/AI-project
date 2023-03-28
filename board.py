@@ -21,7 +21,12 @@ FEN Notation:
 
 """
 
-import move
+# Proprietary code
+from move import Move
+from piece import *
+
+# Packages and libraries
+from copy import deepcopy
 
 """
 
@@ -45,6 +50,10 @@ TODO:
 
 
 """
+
+# Mapping letters stored in Board state to Piece classes
+PIECE_MAPPING = { "K":King, "A":Advisor, "E":Elephant, "H":Horse,
+                  "R":Rook, "C":Cannon, "P":Pawn }
 
 
 class Board:
@@ -95,13 +104,20 @@ class Board:
 
     def __str__(self):
         count = 0
-        board_str = ""
+        board_str = "\n    1 2 3 4 5 6 7 8 9\n\n1   "
+        rank = 1
         for i in range(len(self.state)):
             if count != 8:
                 board_str += (self.state[i] + " ")
                 count += 1
             else:
+                rank += 1
                 board_str += (self.state[i] + "\n")
+                if rank < 10:
+                    board_str += (str(rank) + "   ")
+                elif rank == 10:
+                    board_str += (str(rank) + "  ")
+
                 count = 0
 
         board_str += "\n"
@@ -112,10 +128,7 @@ class Board:
 
         return board_str
 
-    def updateBoardFromMove(self, m: move.Move):
-
-        # TODO: Validate move??
-
+    def updateBoardFromMove(self, m: Move):
         # Swap places in list
         self.state[m.target] = self.state[m.start]
         self.state[m.start] = '+'
@@ -125,17 +138,234 @@ class Board:
             self.turn = 'b'
         else:
             self.turn = 'w'
+    
+    def simulateMove(self, move):
+        # Get the moving piece
+        piece = self.state[(move.start[1]-1)*9 + (move.start[0]-1)]
+        # Deep copy the current state of the board - potentially inefficient
+        simulated_board = deepcopy(self.state)
+        # Simulate the given move
+        simulated_board[(move.start[1]-1)*9 + (move.start[0]-1)] = "+"
+        simulated_board[(move.target[1]-1)*9 + (move.target[0]-1)] = piece
+        return simulated_board
 
     def generateValidMoves(self, file, rank):
         """
-        Given a single piece location, generate a list of pseudo-legal moves
+        Given a single piece location, generate a list of all valid moves
         :@param file {int} vertical line on board, range={1..9}
         :@param rank {int} horizontal line on board, range={1..10}
+
+        :@return moves {[Move]} list of valid moves
         """
 
-        # Identify given piece
+        # If given location does not have a piece, no moves generated
         piece = self.state[(rank-1)*9 + (file-1)]
-        print(piece)
+        if piece == "+":
+            return []
+        # Red piece
+        elif piece.islower():
+            red_side = True
+        # Black piece
+        else:
+            red_side = False
+
+        # 1. Generate pseudo-legal moves
+        moves = Board.generate_pseudo_valid_moves(self.state, file, rank)
+        
+        # 2. Check for two kings facing each other directly
+        moves = list(filter(lambda move: not Board.kings_facing(self.simulateMove(move)), moves))
+
+        # 3. Check for check 
+        moves = list(filter(lambda move: not Board.is_check(self.simulateMove(move), red_side), moves))
+
+        return moves
+
+    @staticmethod
+    def generate_pseudo_valid_moves(board, file, rank):
+        """
+        Given a board state and a single piece location, generate a list of pseudo-legal moves
+        :@param file {int} vertical line on board, range={1..9}
+        :@param rank {int} horizontal line on board, range={1..10}
+
+        Static function allowing to generate moves for the potential board states
+
+        :@return moves {[Move]} list of pseudo-legal moves
+        """
+
+        # List of pseudo-legal moves
+        moves = []
+
+        # Identify piece occupying given location
+        unknown_piece = board[(rank-1)*9 + (file-1)]
+        piece = PIECE_MAPPING[unknown_piece.upper()]
+
+        # Get the movement specification of the given piece
+        vectors, any_dist, area = piece.get_move_vectors(file, rank, unknown_piece.islower())
+        
+        # Check the bounding area for the given piece
+        if area is not None:
+            min_file, max_file = area[0]
+            min_rank, max_rank = area[1]
+        else:
+            min_file, max_file = 1, 9
+            min_rank, max_rank = 1, 10
+
+        # Generate pseudo-legal moves
+        for vector_sequence in vectors:
+
+            new_file, new_rank = file, rank
+
+            # Whether the last considered move should be disqualified
+            disqualified = False
+            # Whether the current sequence of move should be stopped
+            # e.g. If way obstructed, do not consider the remaining positions
+            halt = False
+
+            capture = False
+            cannon_platform = False
+            should_advance = True
+            
+            # This loop allows to model moves of any distance along an axis
+            while should_advance and not halt:
+
+                # For all pieces, apart for Horse this will run once
+                # (Horse has a two-stage move)
+                for vector in vector_sequence:
+
+                    # 1. Compute resulting new position
+                    new_file += vector[0]
+                    new_rank += vector[1]
+                    
+                    # 2. Check if new location is within bounds
+                    if not (min_file <= new_file <= max_file) or not (min_rank <= new_rank <= max_rank):
+                        # Outside the bounding area, check next option
+                        disqualified = True
+                        halt = True
+                        break
+
+                    # 3. Check if new location is occupied
+                    occupied, friendly = Board.is_occupied(board, new_file, new_rank, unknown_piece)
+
+                    # Occupied by friendly piece
+                    if occupied and friendly:
+                        disqualified = True
+                        halt = True
+                    # Occupied by opponent piece, is a single-step move, and piece is not Cannon
+                    elif occupied and vector == vector_sequence[-1] and piece != Cannon:
+                        disqualified = False
+                        capture = True
+                        halt = True
+                    # Occupied by opponent piece and is the first-step of a two-step Horse move
+                    elif occupied:
+                        disqualified = True
+                        halt = True
+
+                    # Special Case: Cannon Capture
+                    # If halted, and not reached end of board, 
+                    # Cannon has encountered a piece it can use as a 'platform'
+                    # Check if there is an opponent piece on the axis past the 'platform'
+                    if piece == Cannon and occupied:
+                        # Cannon platform encountered
+                        if not cannon_platform:
+                            cannon_platform = True
+                            halt = False
+                        # Enemy piece encountered after platform, can capture
+                        elif cannon_platform and not friendly:
+                            disqualified = False
+                            capture = True
+                            halt = True
+                    # Cannon cannot move past obstruction, only capture
+                    elif piece == Cannon and cannon_platform:
+                        disqualified = True
+
+                    if disqualified:
+                        break
+
+                # 4. Create a move and add to list
+                if not disqualified:
+                    move = Move((file, rank), (new_file, new_rank), capture)
+                    moves.append(move)
+
+                # If the given piece can move any distance along an axis (e.g. Cannon or Rook)
+                # the loop should continue until an obstruction is encountered or end of board reached
+                should_advance = any_dist
+
+        return moves
+
+
+    # Static Helper Functions Below
+
+    @staticmethod
+    def is_occupied(board, file, rank, piece):
+        occupier = board[(rank-1)*9 + (file-1)]
+        if occupier != "+":
+            occupied = True
+            friendly = occupier.islower() == piece.islower()
+        else:
+            occupied = False
+            friendly = False
+        return occupied, friendly
+
+    @staticmethod
+    def kings_facing(board):
+        # Find kings within palace
+        black_king = Board.find_king(board)
+        red_king = Board.find_king(board, red_side=True)
+        # Check if they are on different files
+        if black_king[0] != red_king[0]:
+            return False
+        else:
+            file = black_king[0]
+            # Check if there are obstructions on the way
+            for rank in range(black_king[1], red_king[1]):
+                if board[(rank-1)*9 + (file-1)] != "+":
+                    # Obstruction found, kings not facing each other directly
+                    return False
+        return True
+    
+    @staticmethod
+    def find_king(board, red_side=False):
+        # Note: If both king's positions would be stored, this function could potentially be removed
+
+        min_file, max_file = (4,6)
+        # Define king's palace
+        if red_side:
+            min_rank, max_rank = (8,10)
+            king = "k"
+        else:
+            min_rank, max_rank = (1,3)
+            king = "K"
+
+        for rank in range(min_rank, max_rank+1):
+            for file in range(min_file, max_file+1):
+                if board[(rank-1)*9 + (file-1)] == king:
+                    return file, rank
+
+    @staticmethod 
+    def is_check(board, red_side=False):
+        # Find given player's king
+        kings_position = Board.find_king(board, red_side)
+
+        # Generate all the moves for the opponent player only
+        for rank in range(1, 10+1):
+            for file in range(1, 9+1):
+                piece = board[(rank-1)*9 + (file-1)]
+                if (not red_side and piece.islower()) or (red_side and piece.isupper()):
+                    moves = Board.generate_pseudo_valid_moves(board, file, rank)
+                    # If any move results in king's current position then king is at check
+                    if any(map(lambda move: move.target == kings_position, moves)):
+                        return True
+
+        return False
+            
+
+
+
+
+        
+
+
+
 
 
 
