@@ -12,7 +12,7 @@ class Piece(ABC):
     @abstractmethod
     def get_move_vectors(file, rank, red_sie):
         """
-        Given currrent location of the return the possible movement vectors for the given piece, i.e. ways in which the current piece can move, assuming there are no obstructions.
+        Given currrent location of the piece return the possible movement vectors for the given piece, i.e. ways in which the current piece can move, assuming there are no obstructions.
 
         :@param board {Board} current state of the board
         :@param file, rank {int} current file and rank of the piece
