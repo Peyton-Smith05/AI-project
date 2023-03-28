@@ -104,13 +104,20 @@ class Board:
 
     def __str__(self):
         count = 0
-        board_str = ""
+        board_str = "\n    1 2 3 4 5 6 7 8 9\n\n1   "
+        rank = 1
         for i in range(len(self.state)):
             if count != 8:
                 board_str += (self.state[i] + " ")
                 count += 1
             else:
+                rank += 1
                 board_str += (self.state[i] + "\n")
+                if rank < 10:
+                    board_str += (str(rank) + "   ")
+                elif rank == 10:
+                    board_str += (str(rank) + "  ")
+
                 count = 0
 
         board_str += "\n"
@@ -122,9 +129,6 @@ class Board:
         return board_str
 
     def updateBoardFromMove(self, m: Move):
-
-        # TODO: Validate move??
-
         # Swap places in list
         self.state[m.target] = self.state[m.start]
         self.state[m.start] = '+'
@@ -173,10 +177,6 @@ class Board:
 
         # 3. Check for check 
         moves = list(filter(lambda move: not Board.is_check(self.simulateMove(move), red_side), moves))
-        
-        # Print all moves
-        for move in moves:
-            print(move)
 
         return moves
 

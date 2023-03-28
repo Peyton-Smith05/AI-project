@@ -3,7 +3,9 @@
 # This is a sample Python script.
 
 import board
-import move
+from move import Move
+
+from os import system, name
 
 STARTING_STATE_FEN = 'rheakaehr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RHEAKAEHR w - - 0 1'
 
@@ -20,8 +22,18 @@ def getMoveFromString(start, target):
     start = ((start_y - 1) * 9) + (start_x - 1)
     target = ((target_y - 1) * 9) + (target_x - 1)
 
-    new_move = move.Move(start, target)
+    new_move = Move(start, target)
     return new_move
+
+# Clear screen helper function
+def clear_screen():
+    # For windows
+    if name == 'nt':
+        _ = system('cls')
+ 
+    # For macOS and Linux (here, os.name is 'posix')
+    else:
+        _ = system('clear')
 
 
 computer_color = ''
@@ -39,10 +51,26 @@ while True:
 
     print(board)
 
-    if board.turn == human_color:
+    # TODO: For now the game is playable by two humans only
+    # if board.turn == human_color:
+    if True:
         start_str = input('Input piece square (Notation is File Rank of piece ex. 2 3): ')
-        target_str = input('Input target square by same notation: ')
+
+        file, rank = start_str.split(" ")[:2]
+        moves = board.generateValidMoves(int(file), int(rank))
+
+        print("Possible moves:")
+        for move in moves:
+            print(move)
+
+        print()
+        target_str = input('Choose one of the moves by inputting target square by same notation: ')
+        
+        # TODO: This does not check the target square
+        # Maybe the player should choose from the list
         move = getMoveFromString(start_str, target_str)
+
+        clear_screen()
         board.updateBoardFromMove(move)
     else:
         # TODO:
