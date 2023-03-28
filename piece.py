@@ -10,9 +10,9 @@ class Piece(ABC):
     
     @staticmethod
     @abstractmethod
-    def get_move_vectors(board, file, rank, red_sie):
+    def get_move_vectors(file, rank, red_sie):
         """
-        Given currrent location of the board, return the possible movement vectors for the given piece, i.e. ways in which the current piece can move, assuming there are no obstructions.
+        Given currrent location of the return the possible movement vectors for the given piece, i.e. ways in which the current piece can move, assuming there are no obstructions.
 
         :@param board {Board} current state of the board
         :@param file, rank {int} current file and rank of the piece
@@ -37,7 +37,7 @@ class King(Piece):
     move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(0,-1)]]
 
     @staticmethod
-    def get_move_vectors(board, file, rank, red_side):
+    def get_move_vectors(file, rank, red_side):
         if red_side:
             palace = [(4,6),(8,10)]
         else:
@@ -50,7 +50,7 @@ class Advisor(Piece):
     move_vectors = [[(1,1)],[(1,-1)],[(-1,1)],[(-1,-1)]]
 
     @staticmethod
-    def get_move_vectors(board, file, rank, red_side):
+    def get_move_vectors(file, rank, red_side):
         if red_side:
             palace = [(4,6),(8,10)]
         else:
@@ -63,7 +63,7 @@ class Elephant(Piece):
     move_vectors = [[(2,2)],[(2,-2)],[(-2,2)],[(-2,-2)]]
 
     @staticmethod
-    def get_move_vectors(board, file, rank, red_side):
+    def get_move_vectors(file, rank, red_side):
         if red_side:
             river_side = [(1,9),(6,10)]
         else:
@@ -79,7 +79,7 @@ class Horse(Piece):
                     [(0,-1),(1,-1)], [(0,-1),(-1,-1)]]
 
     @staticmethod
-    def get_move_vectors(board, file, rank, red_side):
+    def get_move_vectors(file, rank, red_side):
         return Horse.move_vectors, False, None
 
 class Rook(Piece):
@@ -87,7 +87,7 @@ class Rook(Piece):
     move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(0,-1)]]
 
     @staticmethod
-    def get_move_vectors(board, file, rank, red_side):
+    def get_move_vectors(file, rank, red_side):
         return Rook.move_vectors, True, None
 
 class Cannon(Piece):
@@ -95,7 +95,7 @@ class Cannon(Piece):
     move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(0,-1)]]
 
     @staticmethod
-    def get_move_vectors(board, file, rank, red_side):
+    def get_move_vectors(file, rank, red_side):
         return Cannon.move_vectors, True, None
 
 class Pawn(Piece):
@@ -103,7 +103,7 @@ class Pawn(Piece):
     # Forward and side movement after river crossed
 
     @staticmethod
-    def get_move_vectors(board, file, rank, red_side):
+    def get_move_vectors(file, rank, red_side):
         move_vectors = None
 
         if red_side:
