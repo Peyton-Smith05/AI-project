@@ -82,18 +82,16 @@ while True:
         computer_move = board.generateComputerMove()
         file = computer_move[0]
         rank = computer_move[1]
-        computer_move = str(computer_move)
-        computer_move = computer_move.replace('[', '')
-        computer_move = computer_move.replace(']', '')
-        computer_move = computer_move.replace(',', '')
-        computer_move = str(computer_move)
         moves = board.generateValidMoves(int(file), int(rank))
 
         target_str_temp = random.choice(moves)
         print (target_str_temp)
         target_str = input('Please move the position indicated above: ')
         
-        
+        computer_move = str(computer_move)
+        computer_move = computer_move.replace('[', '')
+        computer_move = computer_move.replace(']', '')
+        computer_move = computer_move.replace(',', '')
         move = getMoveFromString(computer_move, target_str)
         clear_screen()
         board.updateBoardFromMove(move)
