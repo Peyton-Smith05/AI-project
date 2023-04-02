@@ -166,11 +166,19 @@ class Board:
         if piece == "+":
             return []
         # Red piece
+        
         elif piece.islower():
             red_side = True
+
         # Black piece
         else:
             red_side = False
+        
+        if self.turn == 'b' and red_side == True:
+            return []
+        
+        if self.turn == 'r' and red_side == False:
+            return []
 
         # 1. Generate pseudo-legal moves
         moves = Board.generate_pseudo_valid_moves(self.state, file, rank)
