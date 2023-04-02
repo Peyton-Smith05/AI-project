@@ -22,6 +22,7 @@ FEN Notation:
 """
 
 # Proprietary code
+import random
 from move import Move
 from piece import *
 
@@ -105,6 +106,11 @@ class Board:
         # Getting full moves
         self.full_moves = int(parse[5])
 
+        if (self.computer_color == 'b'):
+            self.computer_moves = [[1,1], [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [2,3], [8,3], [1,4], [3,4], [5,4], [7,4], [9,4]]
+        elif (self.computer_color == 'w'):   
+            self.computer_moves = [[1,10], [2,10], [3,10], [4,10], [5,10], [6,10], [7,10], [8,10], [9,10], [2,8], [8,8], [1,7], [3,7], [5,7], [7,7], [9,7]]
+    
     def __str__(self):
         count = 0
         board_str = "\n    1 2 3 4 5 6 7 8 9\n\n1   "
@@ -131,8 +137,30 @@ class Board:
 
         return board_str
 
+    
+    def generateComputerMove (self):
+        return random.choice(self.computer_moves)
+    
+    
+    
     def updateBoardFromMove(self, m: Move):
         # Swap places in list
+       
+        #print (str(m.target))
+        count = 0
+        if (self.turn == self.computer_color):
+            for i in self.computer_moves:
+                i_start = ((i[1] - 1) * 9) + (i[0] - 1)
+                if i_start == m.start:
+                    new_y = (m.target // 9) + 1
+                    new_x = (m.target % 9) + 1
+                    self.computer_moves[count][0] = int(new_x)
+                    self.computer_moves[count][1] = int(new_y)
+                    break
+                count = count + 1
+        
+        print(self.computer_moves)
+
         self.state[m.target] = self.state[m.start]
         self.state[m.start] = '+'
 
@@ -162,6 +190,7 @@ class Board:
         """
 
         # If given location does not have a piece, no moves generated
+        
         piece = self.state[(rank-1)*9 + (file-1)]
         if piece == "+":
             return []
@@ -368,6 +397,8 @@ class Board:
                         return True
 
         return False
+    
+    
             
 
 

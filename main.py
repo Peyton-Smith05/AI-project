@@ -3,6 +3,7 @@
 # This is a sample Python script.
 
 import board
+import random 
 from move import Move
 
 from os import system, name
@@ -50,10 +51,11 @@ board = board.Board(STARTING_STATE_FEN, computer_color)
 while True:
 
     print(board)
+    
 
     # TODO: For now the game is playable by two humans only
     # if board.turn == human_color:
-    if True:
+    if board.turn == human_color:
         start_str = input('Input piece square (Notation is File Rank of piece ex. 2 3): ')
 
         file, rank = start_str.split(" ")[:2]
@@ -72,9 +74,30 @@ while True:
 
         clear_screen()
         board.updateBoardFromMove(move)
+
     else:
         # TODO:
             # Call generate computer moves
+
+        computer_move = board.generateComputerMove()
+        file = computer_move[0]
+        rank = computer_move[1]
+        computer_move = str(computer_move)
+        computer_move = computer_move.replace('[', '')
+        computer_move = computer_move.replace(']', '')
+        computer_move = computer_move.replace(',', '')
+        computer_move = str(computer_move)
+        moves = board.generateValidMoves(int(file), int(rank))
+
+        target_str_temp = random.choice(moves)
+        print (target_str_temp)
+        target_str = input('Please move: ')
+        
+        
+        move = getMoveFromString(computer_move, target_str)
+        clear_screen()
+        board.updateBoardFromMove(move)
+
             # Call evaluate moves
             # Call pick best move
             # Call updateBoardFromMove
