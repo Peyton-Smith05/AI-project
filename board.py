@@ -142,25 +142,32 @@ class Board:
         return random.choice(self.computer_moves)
     
     
-    
     def updateBoardFromMove(self, m: Move):
         # Swap places in list
-       
-        #print (str(m.target))
+
+        new_y = (m.target // 9) + 1
+        new_x = (m.target % 9) + 1
         count = 0
+        # Update position of the computer pieces
         if (self.turn == self.computer_color):
             for i in self.computer_moves:
                 i_start = ((i[1] - 1) * 9) + (i[0] - 1)
                 if i_start == m.start:
-                    new_y = (m.target // 9) + 1
-                    new_x = (m.target % 9) + 1
                     self.computer_moves[count][0] = int(new_x)
                     self.computer_moves[count][1] = int(new_y)
                     break
                 count = count + 1
-        
-        print(self.computer_moves)
+        # Check if any computer piesces are being captured and remove those pieces if they are captured
+        else:
+            for i in self.computer_moves:
+                i_start = ((i[1] - 1) * 9) + (i[0] - 1)
+                if i_start == m.target:
+                    print ("hi")
+                    del self.computer_moves[count]
+                count = count + 1
 
+        print(self.computer_moves)
+        
         self.state[m.target] = self.state[m.start]
         self.state[m.start] = '+'
 

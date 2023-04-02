@@ -91,7 +91,7 @@ while True:
 
         target_str_temp = random.choice(moves)
         print (target_str_temp)
-        target_str = input('Please move: ')
+        target_str = input('Please move the position indicated above: ')
         
         
         move = getMoveFromString(computer_move, target_str)
