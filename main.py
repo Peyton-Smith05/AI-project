@@ -13,7 +13,7 @@ STARTING_STATE_FEN = 'rheakaehr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RHEAKAEH
 
 
 # Helper function
-def getMoveFromString(start, target):
+def getMoveFromString(start, target, board):
 
     # Changing string to integer pos
     start = start.split(" ")
@@ -24,7 +24,14 @@ def getMoveFromString(start, target):
     start = (start_file, start_rank)
     target = (target_file, target_rank)
 
-    new_move = Move(start, target)
+    # Check if player's move was a capture
+    # (will be trivial if player chooses moves from a list)
+    if board.state[(target_rank-1)*9 + (target_file-1)] != "+":
+        capture = True
+    else:
+        capture = False
+
+    new_move = Move(start, target, capture)
     return new_move
 
 # Clear screen helper function
@@ -69,19 +76,23 @@ while True:
         
         # TODO: This does not check the target square
         # Maybe the player should choose from the list
-        move = getMoveFromString(start_str, target_str)
+        move = getMoveFromString(start_str, target_str, board)
         board.updateBoardFromMove(move)
 
         # If player has captured AI's piece, notify the AI
         if move.capture:
-            ai.update_positions(move.start)
+            ai.update_positions(move.target)
 
         clear_screen()
+
     else:
         move = ai.perform_move()
         board.updateBoardFromMove(move)
         clear_screen()
         print("AI: ", move)
+
+    score = ai.evaluate(board.state, ai.positions)
+    print("CURR SCORE ", score)
     
     
 

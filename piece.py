@@ -1,4 +1,5 @@
 from abc import (ABC, abstractmethod)
+import math
 
 class Piece(ABC):
     """
@@ -10,11 +11,10 @@ class Piece(ABC):
     
     @staticmethod
     @abstractmethod
-    def get_move_vectors(file, rank, red_sie):
+    def get_move_vectors(file, rank, red_side):
         """
         Given currrent location of the piece return the possible movement vectors for the given piece, i.e. ways in which the current piece can move, assuming there are no obstructions.
 
-        :@param board {Board} current state of the board
         :@param file, rank {int} current file and rank of the piece
         :@param red_side {bool} is given piece red (bottom player)
 
@@ -28,6 +28,18 @@ class Piece(ABC):
         """
         pass
 
+    @classmethod
+    def get_value(cls, file=None, rank=None, red_side=None):
+        """
+        Given currrent location of the piece return the value of the piece
+
+        :@param file, rank {int} current file and rank of the piece
+        :@param red_side {bool} is given piece red (bottom player)
+
+        :@return value {float}
+        """
+        return cls.value
+
 
 
 # Implementation classes for each piece:
@@ -35,6 +47,8 @@ class Piece(ABC):
 class King(Piece):
     # Orthogonal movements
     move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(0,-1)]]
+    # King's value set to zero because it is considered as a separate heuristic
+    value = 0
 
     @staticmethod
     def get_move_vectors(file, rank, red_side):
@@ -48,6 +62,7 @@ class King(Piece):
 class Advisor(Piece):
     # Diagonal movements
     move_vectors = [[(1,1)],[(1,-1)],[(-1,1)],[(-1,-1)]]
+    value = 2
 
     @staticmethod
     def get_move_vectors(file, rank, red_side):
@@ -61,6 +76,7 @@ class Advisor(Piece):
 class Elephant(Piece):
     # Diagonal movements
     move_vectors = [[(2,2)],[(2,-2)],[(-2,2)],[(-2,-2)]]
+    value = 2
 
     @staticmethod
     def get_move_vectors(file, rank, red_side):
@@ -77,6 +93,7 @@ class Horse(Piece):
                     [(-1,0),(-1,1)], [(1,0),(-1,-1)],
                     [(0,1),(1,1)], [(0,1),(-1,1)],
                     [(0,-1),(1,-1)], [(0,-1),(-1,-1)]]
+    value = 4
 
     @staticmethod
     def get_move_vectors(file, rank, red_side):
@@ -85,6 +102,7 @@ class Horse(Piece):
 class Rook(Piece):
     # Any orthogonal movement
     move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(0,-1)]]
+    value = 9
 
     @staticmethod
     def get_move_vectors(file, rank, red_side):
@@ -93,6 +111,7 @@ class Rook(Piece):
 class Cannon(Piece):
     # Any orthogonal movement
     move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(0,-1)]]
+    value = 4.5
 
     @staticmethod
     def get_move_vectors(file, rank, red_side):
@@ -101,6 +120,8 @@ class Cannon(Piece):
 class Pawn(Piece):
     # Forward movement up to river
     # Forward and side movement after river crossed
+    value_before_river = 1
+    value_after_river = 2
 
     @staticmethod
     def get_move_vectors(file, rank, red_side):
@@ -122,3 +143,20 @@ class Pawn(Piece):
                 move_vectors = [[(0,1)]]
 
         return move_vectors, False, None
+
+    @classmethod
+    def get_value(cls, file=None, rank=None, red_side=None):
+        if red_side:
+            # River crossed
+            if rank <= 5:
+                return Pawn.value_after_river
+            # River not crossed
+            else:
+                return Pawn.value_before_river
+        else:
+            # River crossed
+            if rank >= 6:
+                return Pawn.value_after_river
+            # River not crossed
+            else:
+                return Pawn.value_before_river

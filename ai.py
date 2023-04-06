@@ -1,5 +1,5 @@
 import random
-from board import Board
+from board import Board, PIECE_MAPPING
 
 """
 class AI
@@ -58,3 +58,75 @@ class AI:
         self.positions.remove(old_position)
         if new_position:
             self.positions.add(new_position)
+
+    def evaluate(self, curr_board, curr_positions):
+        """
+        Given the hypothetical state of the board and hypothetical positions of AI's pieces in the current state of the game tree, return a numerical evaluation score.
+
+        :@param curr_board {[char]} hypothetical state of the board; for performance purposes this is NOT the class Board
+        :@param curr_positions {(int, int)} hypothetical positions of AI's pieces
+        """
+
+        # 1. Distance Heuristic
+        # self.distance_heuristic(curr_board, curr_positions)
+
+        # 2. Material Heuristic - Piece Value and Count
+        material_heuristic = self.material_heuristic(curr_board, curr_positions)
+
+        # 3. Threat Heuristic
+        # self.threat_heuristic(curr_board, curr_positions)
+
+        # 4. Mobility Heuristic - Number of Available Moves
+        # self.mobility_heuristic(curr_board, curr_positions)
+
+        # 5. King Safety Heuristic
+        # self.king_safety_heristic(curr_board, curr_positions)
+
+        return material_heuristic
+
+    
+    def material_heuristic(self, curr_board, curr_positions):
+        """
+        Given the hypothetical state of the board and hypothetical positions of AI's pieces in the current state of the game tree, return the difference in the material value of the pieces AI holds and opponent holds.
+
+        :@param curr_board {[char]} hypothetical state of the board; for performance purposes this is NOT the class Board
+        :@param curr_positions {(int, int)} hypothetical positions of AI's pieces
+
+        :@return score {float} the material heuristic; the greater the better for AI
+        """
+        ai_score = 0
+        opponent_score = 0
+
+        if self.side == "w":
+            red_side = True
+        else:
+            red_side = False
+
+        for rank in range(1, 10+1):
+            for file in range(1, 9+1):
+                piece = curr_board[(rank-1)*9 + (file-1)]
+
+                # No piece at this positon
+                if piece == "+":
+                    continue
+                # AI's piece
+                elif self.is_mine(piece):
+                    piece_type = PIECE_MAPPING[piece.upper()]
+                    ai_score += piece_type.get_value(file, rank, red_side)
+                # Opponent's piece
+                else:
+                    piece_type = PIECE_MAPPING[piece.upper()]
+                    opponent_score += piece_type.get_value(file, rank, not red_side)
+
+        difference = ai_score - opponent_score
+        return difference
+
+    def is_mine(self, piece):
+        if self.side == "b" and piece.isupper():
+            return True
+        elif self.side == "w" and piece.islower():
+            return True
+        else:
+            return False
+
+
