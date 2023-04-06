@@ -67,22 +67,22 @@ class AI:
         :@param curr_positions {(int, int)} hypothetical positions of AI's pieces
         """
 
-        # 1. Distance Heuristic
-        # self.distance_heuristic(curr_board, curr_positions)
-
-        # 2. Material Heuristic - Piece Value and Count
+        # 1. Material Heuristic - Piece Value and Count
         material_heuristic = self.material_heuristic(curr_board, curr_positions)
+        print("MATERIAL = ", material_heuristic)
+
+        # 2. Mobility Heuristic - Number of Available Moves
+        # self.mobility_heuristic(curr_board, curr_positions)
+        mobility_heuristic = self.mobility_heuristic(curr_board, curr_positions)
+        print("MOBILITY = ", mobility_heuristic)
 
         # 3. Threat Heuristic
         # self.threat_heuristic(curr_board, curr_positions)
 
-        # 4. Mobility Heuristic - Number of Available Moves
-        # self.mobility_heuristic(curr_board, curr_positions)
-
-        # 5. King Safety Heuristic
+        # 4. King Safety Heuristic
         # self.king_safety_heristic(curr_board, curr_positions)
 
-        return material_heuristic
+        return material_heuristic + mobility_heuristic
 
     
     def material_heuristic(self, curr_board, curr_positions):
@@ -128,5 +128,39 @@ class AI:
             return True
         else:
             return False
+
+    def mobility_heuristic(self, curr_board, curr_positions):
+        """
+        Given the hypothetical state of the board and hypothetical positions of AI's pieces in the current state of the game tree, return the difference in the number of available moves between the AI and the player.
+
+        The assumption is that moves of every piece or are of equal worth.
+
+        :@param curr_board {[char]} hypothetical state of the board; for performance purposes this is NOT the class Board
+        :@param curr_positions {(int, int)} hypothetical positions of AI's pieces
+
+        :@return score {float} the mobility heuristic; the greater the better for AI
+        """
+
+        ai_mobility = 0
+        opponent_mobility = 0
+
+        for rank in range(1, 10+1):
+            for file in range(1, 9+1):
+                # Check if position occupied
+                if curr_board[(rank-1)*9 + (file-1)] == "+":
+                    continue
+                
+                # Generate the moves for this position
+                moves = Board.generate_pseudo_valid_moves(curr_board, file, rank)
+
+                # AI's piece
+                if (file, rank) in curr_positions:
+                    ai_mobility += len(moves)
+                # Opponent's piece
+                else:
+                    opponent_mobility += len(moves)
+
+        difference = ai_mobility - opponent_mobility
+        return difference
 
 
