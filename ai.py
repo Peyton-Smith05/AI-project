@@ -72,17 +72,15 @@ class AI:
         print("MATERIAL = ", material_heuristic)
 
         # 2. Mobility Heuristic - Number of Available Moves
-        # self.mobility_heuristic(curr_board, curr_positions)
-        mobility_heuristic = self.mobility_heuristic(curr_board, curr_positions)
+        # 3. Threat Heuristic - Number of Pieces Player's Can Threat
+        mobility_heuristic, threat_heuristic = self.mobility_and_threat_heuristic(curr_board, curr_positions)
         print("MOBILITY = ", mobility_heuristic)
-
-        # 3. Threat Heuristic
-        # self.threat_heuristic(curr_board, curr_positions)
+        print("THREATS = ", threat_heuristic)
 
         # 4. King Safety Heuristic
         # self.king_safety_heristic(curr_board, curr_positions)
 
-        return material_heuristic + mobility_heuristic
+        return material_heuristic + mobility_heuristic + threat_heuristic
 
     
     def material_heuristic(self, curr_board, curr_positions):
@@ -129,9 +127,9 @@ class AI:
         else:
             return False
 
-    def mobility_heuristic(self, curr_board, curr_positions):
+    def mobility_and_threat_heuristic(self, curr_board, curr_positions):
         """
-        Given the hypothetical state of the board and hypothetical positions of AI's pieces in the current state of the game tree, return the difference in the number of available moves between the AI and the player.
+        Given the hypothetical state of the board and hypothetical positions of AI's pieces in the current state of the game tree, return the difference in the number of available moves between the AI and the player (mobility heuristic); and difference in the number of threats a player can make (threat heuristic).
 
         The assumption is that moves of every piece or are of equal worth.
 
@@ -139,10 +137,14 @@ class AI:
         :@param curr_positions {(int, int)} hypothetical positions of AI's pieces
 
         :@return score {float} the mobility heuristic; the greater the better for AI
+        :@return score {float} the threat heuristic; the greater the better for AI
         """
 
         ai_mobility = 0
         opponent_mobility = 0
+
+        ai_threats = 0
+        opponent_threats = 0
 
         for rank in range(1, 10+1):
             for file in range(1, 9+1):
@@ -153,14 +155,20 @@ class AI:
                 # Generate the moves for this position
                 moves = Board.generate_pseudo_valid_moves(curr_board, file, rank)
 
+                # Check the number of threats - capture moves
+                threats = len(list(filter(lambda move: move.capture, moves)))
+
                 # AI's piece
                 if (file, rank) in curr_positions:
                     ai_mobility += len(moves)
+                    ai_threats += threats
                 # Opponent's piece
                 else:
                     opponent_mobility += len(moves)
+                    opponent_threats += threats
 
-        difference = ai_mobility - opponent_mobility
-        return difference
+        mobility_difference = ai_mobility - opponent_mobility
+        threat_difference = ai_threats - opponent_threats
+        return mobility_difference, threat_difference
 
 
