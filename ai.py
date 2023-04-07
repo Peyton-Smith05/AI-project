@@ -1,5 +1,8 @@
 import random
 from board import Board, PIECE_MAPPING
+from copy import deepcopy
+import math
+from time import time
 
 """
 class AI
@@ -20,6 +23,9 @@ TODO: Perform Reinforcement Learning to find Optimal Weightage for Evaluation He
 BLACK_START_POSITIONS = [(1,1), (2,1), (3,1), (4,1), (5,1), (6,1), (7,1), (8,1), (9,1), (2,3), (8,3), (1,4), (3,4), (5,4), (7,4), (9,4)]
 WHITE_START_POSITIONS = [(1,10), (2,10), (3,10), (4,10), (5,10), (6,10), (7,10), (8,10), (9,10), (2,8), (8,8), (1,7), (3,7), (5,7), (7,7), (9,7)]
 
+MAX = 1
+MIN = -1
+
 class AI:
 
     def __init__(self, side, board):
@@ -36,20 +42,64 @@ class AI:
 
         :@return move {Move} the most optimum move
         """
-        # TOOD: Call minimax when implemented
+        # Measure time taken to compute best move
+        start_time = time()
 
-        # Temporary Move Choice (Depth=1)
-        # 1. Choose piece at random
+        # Call minimax to find best move
+        best_move, best_score = self.minimax(self.board.state, 3, 1, MAX)
+        # Update piece positions
+        self.update_positions(best_move.start, best_move.target)
+
+        end_time = time()
+        diff = end_time - start_time
+
+        return best_move, diff
+
+    def minimax(self, board, max_depth, depth, turn):
+        # For each position, find available moves
         moves = []
-        for position in self.positions:
-            moves += self.board.generateValidMoves(position[0], position[1])
-        
-        sort_key = lambda move: self.evaluate(Board.simulate_move(self.board.state, move), self.positions)
-        moves.sort(key=sort_key)
-        move = moves[-1]
-        # 3. Update positions after move
-        self.update_positions(move.start, move.target)
-        return move
+        for rank in range(1, 10+1):
+            for file in range(1, 9+1):
+                piece = board[(rank-1)*9 + (file-1)]
+                # No piece at this positon
+                if piece == "+":
+                    continue
+                # AI's piece and AI's turn
+                elif self.is_mine(piece) and turn == MAX:
+                    moves += Board.generate_pseudo_valid_moves(board, file, rank)
+                # Opponent's piece and Opponent's turn
+                elif not self.is_mine(piece) and turn == MIN:
+                    moves += Board.generate_pseudo_valid_moves(board, file, rank)
+
+        # Keep track of best seen move
+        best_move = None
+        best_score = -math.inf
+
+        # !!!!
+        # TODO: Order the moves list here and implement alpha-beta in loop below
+        # !!!!
+
+        for move in moves:
+            simulated_board = Board.simulate_move(board, move)
+
+            # If maximum depth reached, evaluate resulting positions
+            if depth == max_depth:
+                score = self.evaluate(simulated_board)
+            # Else continue to recursively call minimax
+            else:
+                if turn == MAX: new_turn = MIN
+                else: new_turn = MAX
+
+                _, score = self.minimax(simulated_board, max_depth, depth+1, new_turn)
+
+            # Update best move
+            # print("MINIMAX d=", depth, " ", move, "; score=", score)
+            if score > best_score:
+                best_score = score
+                best_move = move
+
+        return best_move, best_score
+
 
     def update_positions(self, old_position, new_position=None):
         """
@@ -62,7 +112,7 @@ class AI:
         if new_position:
             self.positions.add(new_position)
 
-    def evaluate(self, curr_board, curr_positions):
+    def evaluate(self, curr_board):
         """
         Given the hypothetical state of the board and hypothetical positions of AI's pieces in the current state of the game tree, return a numerical evaluation score.
 
@@ -71,27 +121,25 @@ class AI:
         """
 
         # 1. Material Heuristic - Piece Value and Count
-        material_heuristic = self.material_heuristic(curr_board, curr_positions)
-        print("MATERIAL = ", material_heuristic)
+        material_heuristic = self.material_heuristic(curr_board)
+        # print("MATERIAL = ", material_heuristic)
 
         # 2. Mobility Heuristic - Number of Available Moves
         # 3. Threat Heuristic - Number of Pieces Player's Can Threat
-        mobility_heuristic, threat_heuristic = self.mobility_and_threat_heuristic(curr_board, curr_positions)
-        print("MOBILITY = ", mobility_heuristic)
-        print("THREATS = ", threat_heuristic)
+        mobility_heuristic, threat_heuristic = self.mobility_and_threat_heuristic(curr_board)
+        # print("MOBILITY = ", mobility_heuristic)
+        # print("THREATS = ", threat_heuristic)
 
         # 4. King Safety Heuristic
         # self.king_safety_heristic(curr_board, curr_positions)
 
         return material_heuristic + mobility_heuristic + threat_heuristic
-
     
-    def material_heuristic(self, curr_board, curr_positions):
+    def material_heuristic(self, curr_board):
         """
-        Given the hypothetical state of the board and hypothetical positions of AI's pieces in the current state of the game tree, return the difference in the material value of the pieces AI holds and opponent holds.
+        Given the hypothetical state of the board in the current state of the game tree, return the difference in the material value of the pieces AI holds and opponent holds.
 
         :@param curr_board {[char]} hypothetical state of the board; for performance purposes this is NOT the class Board
-        :@param curr_positions {(int, int)} hypothetical positions of AI's pieces
 
         :@return score {float} the material heuristic; the greater the better for AI
         """
@@ -130,14 +178,13 @@ class AI:
         else:
             return False
 
-    def mobility_and_threat_heuristic(self, curr_board, curr_positions):
+    def mobility_and_threat_heuristic(self, curr_board):
         """
-        Given the hypothetical state of the board and hypothetical positions of AI's pieces in the current state of the game tree, return the difference in the number of available moves between the AI and the player (mobility heuristic); and difference in the number of threats a player can make (threat heuristic).
+        Given the hypothetical state of the boardin the current state of the game tree, return the difference in the number of available moves between the AI and the player (mobility heuristic); and difference in the number of threats a player can make (threat heuristic).
 
         The assumption is that moves of every piece or are of equal worth.
 
         :@param curr_board {[char]} hypothetical state of the board; for performance purposes this is NOT the class Board
-        :@param curr_positions {(int, int)} hypothetical positions of AI's pieces
 
         :@return score {float} the mobility heuristic; the greater the better for AI
         :@return score {float} the threat heuristic; the greater the better for AI
@@ -152,7 +199,8 @@ class AI:
         for rank in range(1, 10+1):
             for file in range(1, 9+1):
                 # Check if position occupied
-                if curr_board[(rank-1)*9 + (file-1)] == "+":
+                piece = curr_board[(rank-1)*9 + (file-1)]
+                if piece == "+":
                     continue
                 
                 # Generate the moves for this position
@@ -162,7 +210,7 @@ class AI:
                 threats = len(list(filter(lambda move: move.capture, moves)))
 
                 # AI's piece
-                if (file, rank) in curr_positions:
+                if self.is_mine(piece):
                     ai_mobility += len(moves)
                     ai_threats += threats
                 # Opponent's piece

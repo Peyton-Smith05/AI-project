@@ -86,12 +86,14 @@ while True:
         clear_screen()
 
     else:
-        move = ai.perform_move()
+        print("AI computing move...")
+        move, time = ai.perform_move()
         board.updateBoardFromMove(move)
         clear_screen()
         print("AI: ", move)
+        print("Time taken: ", time, " seconds")
 
-    score = ai.evaluate(board.state, ai.positions)
+    score = ai.evaluate(board.state)
     print("CURR SCORE ", score)
     
     
