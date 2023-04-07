@@ -157,11 +157,12 @@ class Board:
                 position = Board.find_king(self.state, side)
                 moves = Board.generate_pseudo_valid_moves(self.state, position[0], position[1])
                 # Checkmate
+                print()
                 if len(moves) == 0:
-                    print(name, " IS AT CHECKMATE. BLACK HAS WON THE GAME")
+                    print(name, " IS IN CHECKMATE. END OF THE GAME")
                     return True, name
                 else:
-                    print(name, " IS AT CHECK")
+                    print(name, " IS IN CHECK")
         return False, ""
             
     

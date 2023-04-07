@@ -109,7 +109,10 @@ while True:
 
     else:
         clear_screen()
+        end, player = board.checkForEndGame()
         print(board)
+        if end == True:
+            break
         print("AI computing move...")
         move, score, time = ai.perform_move()
         board.updateBoardFromMove(move)
@@ -118,9 +121,8 @@ while True:
         print("Time taken: ", time, " seconds")
         print("Moves combinations considered: ", ai.moves_considered)
         print("CURR SCORE ", score)
-        end, player = board.checkForEndGame()
-        if end == True:
-            break
+
+input('Press enter to exit the game')
     
     
 
