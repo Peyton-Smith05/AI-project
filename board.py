@@ -149,10 +149,14 @@ class Board:
             self.turn = 'w'
     
     def simulateMove(self, move):
+        return Board.simulate_move(self.state, move)
+
+    @staticmethod
+    def simulate_move(board, move):
         # Get the moving piece
-        piece = self.state[(move.start[1]-1)*9 + (move.start[0]-1)]
+        piece = board[(move.start[1]-1)*9 + (move.start[0]-1)]
         # Deep copy the current state of the board - potentially inefficient
-        simulated_board = deepcopy(self.state)
+        simulated_board = deepcopy(board)
         # Simulate the given move
         simulated_board[(move.start[1]-1)*9 + (move.start[0]-1)] = "+"
         simulated_board[(move.target[1]-1)*9 + (move.target[0]-1)] = piece

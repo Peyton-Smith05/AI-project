@@ -47,8 +47,8 @@ class Piece(ABC):
 class King(Piece):
     # Orthogonal movements
     move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(0,-1)]]
-    # King's value set to zero because it is considered as a separate heuristic
-    value = 0
+    # King's value is infinity, for this purposes an arbitrarily high value
+    value = 100000
 
     @staticmethod
     def get_move_vectors(file, rank, red_side):

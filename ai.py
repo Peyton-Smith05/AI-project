@@ -38,12 +38,15 @@ class AI:
         """
         # TOOD: Call minimax when implemented
 
-        # Temporary random move
+        # Temporary Move Choice (Depth=1)
         # 1. Choose piece at random
-        piece = random.choice(list(self.positions))
-        # 2. Choose a random move for that piece
-        moves = self.board.generateValidMoves(piece[0], piece[1])
-        move = random.choice(moves)
+        moves = []
+        for position in self.positions:
+            moves += self.board.generateValidMoves(position[0], position[1])
+        
+        sort_key = lambda move: self.evaluate(Board.simulate_move(self.board.state, move), self.positions)
+        moves.sort(key=sort_key)
+        move = moves[-1]
         # 3. Update positions after move
         self.update_positions(move.start, move.target)
         return move
