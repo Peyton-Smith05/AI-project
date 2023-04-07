@@ -90,7 +90,7 @@ class Elephant(Piece):
 class Horse(Piece):
     # One orthogonal movement, followed by one diagonal
     move_vectors = [[(1,0),(1,1)], [(1,0),(1,-1)],
-                    [(-1,0),(-1,1)], [(1,0),(-1,-1)],
+                    [(-1,0),(-1,1)], [(-1,0),(-1,-1)],
                     [(0,1),(1,1)], [(0,1),(-1,1)],
                     [(0,-1),(1,-1)], [(0,-1),(-1,-1)]]
     value = 4
