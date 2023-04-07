@@ -43,8 +43,6 @@ from copy import deepcopy
 
 TODO:
 
-@:func evaluateBoardPos()
-
 @:func validateMove(m: move.Move): General function to check if the move is psuedo legal - This can probably be dealt with by comparing user input to the output of generateValidMoves()
 
 @:func checkForGameEnd()
@@ -149,6 +147,23 @@ class Board:
             self.turn = 'b'
         else:
             self.turn = 'w'
+
+    def checkForEndGame(self):
+        # TODO: Add other conditions for game end
+        # Check if King is at check
+        for (side, name) in [(True, "White"), (False, "black")]:
+            if (Board.is_check(self.state, side)):
+                # Check if King can escape check
+                position = Board.find_king(self.state, side)
+                moves = Board.generate_pseudo_valid_moves(self.state, position[0], position[1])
+                # Checkmate
+                if len(moves) == 0:
+                    print(name, " IS AT CHECKMATE. BLACK HAS WON THE GAME")
+                    return True, name
+                else:
+                    print(name, " IS AT CHECK")
+        return False, ""
+            
     
     def simulateMove(self, move):
         return Board.simulate_move(self.state, move)

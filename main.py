@@ -103,6 +103,9 @@ while True:
                 ai.update_positions(move.target)
 
             move_allowed = True
+            end, player = board.checkForEndGame()
+            if end == True:
+                break
 
     else:
         clear_screen()
@@ -115,6 +118,9 @@ while True:
         print("Time taken: ", time, " seconds")
         print("Moves combinations considered: ", ai.moves_considered)
         print("CURR SCORE ", score)
+        end, player = board.checkForEndGame()
+        if end == True:
+            break
     
     
 
