@@ -113,7 +113,8 @@ class Board:
     
     def __str__(self):
         count = 0
-        board_str = "\n    1 2 3 4 5 6 7 8 9\n\n1   "
+        board_str = "\n          BLACK              "
+        board_str += "\n    1 2 3 4 5 6 7 8 9\n\n1   "
         rank = 1
         for i in range(len(self.state)):
             if count != 8:
@@ -129,6 +130,7 @@ class Board:
 
                 count = 0
 
+        board_str += "\n          WHITE              \n"
         board_str += "\n"
         if self.turn == 'w':
             board_str += "White to move"

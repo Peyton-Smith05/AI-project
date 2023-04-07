@@ -1,8 +1,7 @@
-import random
-from board import Board, PIECE_MAPPING
-from copy import deepcopy
 import math
 from time import time
+
+from board import Board, PIECE_MAPPING
 
 """
 class AI
@@ -23,8 +22,16 @@ TODO: Perform Reinforcement Learning to find Optimal Weightage for Evaluation He
 BLACK_START_POSITIONS = [(1,1), (2,1), (3,1), (4,1), (5,1), (6,1), (7,1), (8,1), (9,1), (2,3), (8,3), (1,4), (3,4), (5,4), (7,4), (9,4)]
 WHITE_START_POSITIONS = [(1,10), (2,10), (3,10), (4,10), (5,10), (6,10), (7,10), (8,10), (9,10), (2,8), (8,8), (1,7), (3,7), (5,7), (7,7), (9,7)]
 
+# Minimax configuration
 MAX = 1
 MIN = -1
+MAX_DEPTH = 3
+
+# Weights for evaluation heurstics
+# [material, mobility, threats]
+# currently initialised to be of equal importance
+# TODO: Perform Reinforcement Learning to find optimum weightage
+WEIGHTS = [1, 1, 1]
 
 class AI:
 
@@ -40,22 +47,41 @@ class AI:
         """
         Make AI perform a move based on current state of the board
 
-        :@return move {Move} the most optimum move
+        :@return best_move {Move} the most optimum move
+        :@return best_score {float} the score of the most optimum move
+        :@return time_taken {float} the time taken to compute a move in seconds
         """
         # Measure time taken to compute best move
         start_time = time()
+        self.moves_considered = 0
 
         # Call minimax to find best move
-        best_move, best_score = self.minimax(self.board.state, 3, 1, MAX)
+        best_move, best_score = self.minimax(self.board.state, MAX_DEPTH, 1, MAX)
         # Update piece positions
         self.update_positions(best_move.start, best_move.target)
 
         end_time = time()
-        diff = end_time - start_time
+        time_taken = end_time - start_time
 
-        return best_move, diff
+        return best_move, best_score, time_taken
 
     def minimax(self, board, max_depth, depth, turn):
+        """
+        Implementation of the vanilla minimax algorithm
+
+        TODO: Implement Alpha-Beta Pruning (see below)
+        TODO: Implement ordering to optimise Alpha-Beta Pruning (see below)
+        TODO: Optional extension: Implement multi-threading
+
+        :@param board {[char]} the hypothetical state of the board
+        :@param max_depth {int} maximum depth of recursion in the game tree
+        :@param depth (int) current depth in the game tree
+        :@param turn (int) specifies MAX or MIN at the current level
+
+        :@return best_move {Move} the most optimum move
+        :@return best_score {float} the score of the most optimum move
+        """
+
         # For each position, find available moves
         moves = []
         for rank in range(1, 10+1):
@@ -73,14 +99,14 @@ class AI:
 
         # Keep track of best seen move
         best_move = None
-        best_score = -math.inf
+        if turn == MAX: best_score = -math.inf
+        else: best_score = math.inf
 
-        # !!!!
         # TODO: Order the moves list here and implement alpha-beta in loop below
-        # !!!!
 
         for move in moves:
             simulated_board = Board.simulate_move(board, move)
+            self.moves_considered += 1
 
             # If maximum depth reached, evaluate resulting positions
             if depth == max_depth:
@@ -93,8 +119,7 @@ class AI:
                 _, score = self.minimax(simulated_board, max_depth, depth+1, new_turn)
 
             # Update best move
-            # print("MINIMAX d=", depth, " ", move, "; score=", score)
-            if score > best_score:
+            if (turn == MAX and score > best_score) or (turn == MIN and score < best_score):
                 best_score = score
                 best_move = move
 
@@ -121,19 +146,17 @@ class AI:
         """
 
         # 1. Material Heuristic - Piece Value and Count
-        material_heuristic = self.material_heuristic(curr_board)
+        material = self.material_heuristic(curr_board)
         # print("MATERIAL = ", material_heuristic)
 
         # 2. Mobility Heuristic - Number of Available Moves
         # 3. Threat Heuristic - Number of Pieces Player's Can Threat
-        mobility_heuristic, threat_heuristic = self.mobility_and_threat_heuristic(curr_board)
-        # print("MOBILITY = ", mobility_heuristic)
-        # print("THREATS = ", threat_heuristic)
+        mobility, threats = self.mobility_and_threat_heuristic(curr_board)
+        
+        heuristics = [material, mobility, threats]
+        final_score = sum([heuristic * weight for heuristic, weight in zip(heuristics, WEIGHTS)])
 
-        # 4. King Safety Heuristic
-        # self.king_safety_heristic(curr_board, curr_positions)
-
-        return material_heuristic + mobility_heuristic + threat_heuristic
+        return final_score
     
     def material_heuristic(self, curr_board):
         """

@@ -1,7 +1,3 @@
-# Example file showing a basic pygame "game loop"
-
-# This is a sample Python script.
-
 import board
 import random 
 from move import Move
@@ -59,42 +55,66 @@ ai = AI(computer_color, board)
 
 while True:
 
-    print(board)
-
     if board.turn == human_color:
-        start_str = input('Input piece square (Notation is File Rank of piece ex. 2 3): ')
+        move_allowed = False
+        while not move_allowed:
+            print(board)
+            # Ask user for input
+            start_str = input('Input piece square (Notation is File Rank of piece ex. 2 3): ')
+            file, rank = start_str.split(" ")[:2]
+            file = int(file)
+            rank = int(rank)
 
-        file, rank = start_str.split(" ")[:2]
-        moves = board.generateValidMoves(int(file), int(rank))
+            # Check if position occupied and user's piece
+            piece = board.state[(rank-1)*9 + (file-1)]
+            if piece == "+" or ai.is_mine(piece):
+                clear_screen()
+                print("This position is not occupied or is not your piece")
+                continue
 
-        print("Possible moves:")
-        for move in moves:
-            print(move)
+            # Generate valid moves
+            moves = board.generateValidMoves(file, rank)
 
-        print()
-        target_str = input('Choose one of the moves by inputting target square by same notation: ')
-        
-        # TODO: This does not check the target square
-        # Maybe the player should choose from the list
-        move = getMoveFromString(start_str, target_str, board)
-        board.updateBoardFromMove(move)
+            # Ask user to choose a different piece if no moves for chosen piece
+            if len(moves) == 0:
+                clear_screen()
+                print("No moves available for this piece")
+                continue
 
-        # If player has captured AI's piece, notify the AI
-        if move.capture:
-            ai.update_positions(move.target)
+            print("Possible moves:")
+            for move in moves:
+                print(move)
 
-        clear_screen()
+            print()
+            target_str = input('Choose one of the moves by inputting target square by same notation or cancel to choose a different piece: ')
+            
+            # User decided to choose another piece
+            if target_str.strip() == "cancel":
+                clear_screen()
+                continue
+
+            # TODO: This does not check the target square
+            # Maybe the player should choose from the list
+            move = getMoveFromString(start_str, target_str, board)
+            board.updateBoardFromMove(move)
+
+            # If player has captured AI's piece, notify the AI
+            if move.capture:
+                ai.update_positions(move.target)
+
+            move_allowed = True
 
     else:
+        clear_screen()
+        print(board)
         print("AI computing move...")
-        move, time = ai.perform_move()
+        move, score, time = ai.perform_move()
         board.updateBoardFromMove(move)
         clear_screen()
         print("AI: ", move)
         print("Time taken: ", time, " seconds")
-
-    score = ai.evaluate(board.state)
-    print("CURR SCORE ", score)
+        print("Moves combinations considered: ", ai.moves_considered)
+        print("CURR SCORE ", score)
     
     
 
