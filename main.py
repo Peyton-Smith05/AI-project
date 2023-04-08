@@ -58,8 +58,6 @@ while True:
 
     if board.turn == human_color:
         move_allowed = False
-        print(board.player_pieces)
-        print(board.usermoves)
         while not move_allowed:
             print(board)
             # Ask user for input
