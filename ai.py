@@ -164,7 +164,6 @@ class AI:
         else: best_score = math.inf
 
         # TODO: Order the moves list here and implement alpha-beta in loop below
-        print(moves)
 
         for move in moves:
             simulated_board = Board.simulate_move(board, move)
