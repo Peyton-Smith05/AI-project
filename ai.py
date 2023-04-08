@@ -56,7 +56,8 @@ class AI:
         self.moves_considered = 0
 
         # Call minimax to find best move
-        best_move, best_score = self.minimax(self.board.state, MAX_DEPTH, 1, MAX)
+        best_move, best_score = self.minimax2(self.board.state, MAX_DEPTH, 1, -math.inf, math.inf, MAX)
+        #best_move, best_score = self.minimax(self.board.state, MAX_DEPTH, 1, MAX)
         # Update piece positions
         self.update_positions(best_move.start, best_move.target)
 
@@ -124,8 +125,157 @@ class AI:
                 best_move = move
 
         return best_move, best_score
+    
+    def minimax2(self, board, max_depth, depth, alpha, beta, turn):
+        """
+        Implementation of the vanilla minimax algorithm
+
+        TODO: Implement Alpha-Beta Pruning (see below)
+        TODO: Implement ordering to optimise Alpha-Beta Pruning (see below)
+        TODO: Optional extension: Implement multi-threading
+
+        :@param board {[char]} the hypothetical state of the board
+        :@param max_depth {int} maximum depth of recursion in the game tree
+        :@param depth (int) current depth in the game tree
+        :@param turn (int) specifies MAX or MIN at the current level
+
+        :@return best_move {Move} the most optimum move
+        :@return best_score {float} the score of the most optimum move
+        """
+
+        # For each position, find available moves
+        moves = []
+        for rank in range(1, 10+1):
+            for file in range(1, 9+1):
+                piece = board[(rank-1)*9 + (file-1)]
+                # No piece at this positon
+                if piece == "+":
+                    continue
+                # AI's piece and AI's turn
+                elif self.is_mine(piece) and turn == MAX:
+                    moves += Board.generate_pseudo_valid_moves(board, file, rank)
+                # Opponent's piece and Opponent's turn
+                elif not self.is_mine(piece) and turn == MIN:
+                    moves += Board.generate_pseudo_valid_moves(board, file, rank)
+
+        # Keep track of best seen move
+        best_move = None
+        if turn == MAX: best_score = -math.inf
+        else: best_score = math.inf
+
+        # TODO: Order the moves list here and implement alpha-beta in loop below
+        print(moves)
+
+        for move in moves:
+            simulated_board = Board.simulate_move(board, move)
+            self.moves_considered += 1
+
+            # If maximum depth reached, evaluate resulting positions
+            if depth == max_depth:
+                score = self.evaluate(simulated_board)
+            # Else continue to recursively call minimax
+            else:
+                if turn == MAX: new_turn = MIN
+                else: new_turn = MAX
+
+                _, score = self.minimax2(simulated_board, max_depth, depth+1, alpha, beta, new_turn)
+
+            # Update best move
+            if (turn == MAX and score > best_score): 
+                best_score = score
+                best_move = move
+                alpha = max(alpha, best_score)
+                if (beta <= alpha):
+                    break
+
+            elif (turn == MIN and score < best_score):
+                best_score = score
+                best_move = move
+                beta = min(beta, best_score)
+                if (beta <= alpha):
+                    break
+
+        return best_move, best_score
 
 
+    def minimax3(self, board, max_depth, depth, alpha, beta, turn):
+        """
+        Implementation of the vanilla minimax algorithm
+
+        TODO: Implement Alpha-Beta Pruning (see below)
+        TODO: Implement ordering to optimise Alpha-Beta Pruning (see below)
+        TODO: Optional extension: Implement multi-threading
+
+        :@param board {[char]} the hypothetical state of the board
+        :@param max_depth {int} maximum depth of recursion in the game tree
+        :@param depth (int) current depth in the game tree
+        :@param turn (int) specifies MAX or MIN at the current level
+
+        :@return best_move {Move} the most optimum move
+        :@return best_score {float} the score of the most optimum move
+        """
+
+        # For each position, find available moves
+        moves = []
+        for rank in range(1, 10+1):
+            for file in range(1, 9+1):
+                piece = board[(rank-1)*9 + (file-1)]
+                # No piece at this positon
+                if piece == "+":
+                    continue
+                # AI's piece and AI's turn
+                elif self.is_mine(piece) and turn == MAX:
+                    moves += Board.generate_pseudo_valid_moves(board, file, rank)
+                # Opponent's piece and Opponent's turn
+                elif not self.is_mine(piece) and turn == MIN:
+                    moves += Board.generate_pseudo_valid_moves(board, file, rank)
+
+        # Keep track of best seen move
+        best_move = None
+        if turn == MAX: best_score = -math.inf
+        else: best_score = math.inf
+
+        # TODO: Order the moves list here and implement alpha-beta in loop below
+
+        
+
+        for move in moves:
+            simulated_board = Board.simulate_move(board, move)
+            self.moves_considered += 1
+
+            # If maximum depth reached, evaluate resulting positions
+            if depth == max_depth:
+                score = self.evaluate(simulated_board)
+            # Else continue to recursively call minimax
+            else:
+                if turn == MAX: new_turn = MIN
+                else: new_turn = MAX
+
+                _, score = self.minimax2(simulated_board, max_depth, depth+1, alpha, beta, new_turn)
+
+            # Update best move
+            if (turn == MAX and score > best_score): 
+                best_score = score
+                best_move = move
+                alpha = max(alpha, best_score)
+                if (beta <= alpha):
+                    break
+
+            elif (turn == MIN and score < best_score):
+                best_score = score
+                best_move = move
+                beta = min(beta, best_score)
+                if (beta <= alpha):
+                    break
+
+        return best_move, best_score
+    
+    def order_moves(self, moves):
+
+
+
+        return 0
+    
     def update_positions(self, old_position, new_position=None):
         """
         Update the AI's list of current piece positions
