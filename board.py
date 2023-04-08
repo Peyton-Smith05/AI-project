@@ -594,7 +594,7 @@ class Board:
                             move = Move((file, rank), (new_file, new_rank), capture, -1)
                             break
                         else: 
-                            move = Move((file, rank), (new_file, new_rank), capture, 3)
+                            move = Move((file, rank), (new_file, new_rank), capture, 5)
                     moves.append(move)
                 elif not disqualified and capture == True:
                     captured_piece = board[(new_rank-1)*9 + (new_file-1)] 
@@ -605,7 +605,7 @@ class Board:
                         move = Move((file, rank), (new_file, new_rank), capture, 10)
                         moves.append(move)
                     else:
-                        move = Move((file, rank), (new_file, new_rank), 5)
+                        move = Move((file, rank), (new_file, new_rank), 0)
                         moves.append(move)
 
 
