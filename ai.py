@@ -35,13 +35,14 @@ WEIGHTS = [1, 1, 1]
 
 class AI:
 
-    def __init__(self, side, board):
+    def __init__(self, side, board, usermove):
         self.side = side
         if side == "b":
             self.positions = set(BLACK_START_POSITIONS)
         else:
             self.positions = set(WHITE_START_POSITIONS)
         self.board = board
+        self.usermove = usermove
 
     def perform_move(self):
         """
@@ -56,7 +57,8 @@ class AI:
         self.moves_considered = 0
 
         # Call minimax to find best move
-        best_move, best_score = self.minimax2(self.board.state, MAX_DEPTH, 1, -math.inf, math.inf, MAX)
+        best_move, best_score = self.minimax3(self.board.state, MAX_DEPTH, 1, -math.inf, math.inf, MAX)
+        #best_move, best_score = self.minimax2(self.board.state, MAX_DEPTH, 1, -math.inf, math.inf, MAX)
         #best_move, best_score = self.minimax(self.board.state, MAX_DEPTH, 1, MAX)
         # Update piece positions
         self.update_positions(best_move.start, best_move.target)
@@ -224,7 +226,7 @@ class AI:
                     continue
                 # AI's piece and AI's turn
                 elif self.is_mine(piece) and turn == MAX:
-                    moves += Board.generate_pseudo_valid_moves(board, file, rank)
+                    moves += Board.generate_pseudo_valid_moves_ai(board, file, rank, self.side, self.usermove)
                 # Opponent's piece and Opponent's turn
                 elif not self.is_mine(piece) and turn == MIN:
                     moves += Board.generate_pseudo_valid_moves(board, file, rank)

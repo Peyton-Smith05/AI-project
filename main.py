@@ -51,12 +51,15 @@ else:
     computer_color = 'w'
 
 board = board.Board(STARTING_STATE_FEN, computer_color)
-ai = AI(computer_color, board)
+temp_self = board.usermoves
+ai = AI(computer_color, board, temp_self)
 
 while True:
 
     if board.turn == human_color:
         move_allowed = False
+        print(board.player_pieces)
+        print(board.usermoves)
         while not move_allowed:
             print(board)
             # Ask user for input
