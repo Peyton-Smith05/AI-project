@@ -35,7 +35,7 @@ WEIGHTS = [1, 1, 1]
 
 class AI:
 
-    def __init__(self, side, board, usermove):
+    def __init__(self, side, board, usermove, aimove):
         self.side = side
         if side == "b":
             self.positions = set(BLACK_START_POSITIONS)
@@ -43,6 +43,7 @@ class AI:
             self.positions = set(WHITE_START_POSITIONS)
         self.board = board
         self.usermove = usermove
+        self.aimove = aimove
 
     def perform_move(self):
         """
@@ -229,7 +230,7 @@ class AI:
                     moves += Board.generate_pseudo_valid_moves_ai(board, file, rank, self.side, self.usermove)
                 # Opponent's piece and Opponent's turn
                 elif not self.is_mine(piece) and turn == MIN:
-                    moves += Board.generate_pseudo_valid_moves(board, file, rank)
+                    moves += Board.generate_pseudo_valid_moves_user(board, file, rank, self.side, self.aimove)
 
         # Keep track of best seen move
         best_move = None

@@ -52,10 +52,13 @@ else:
 
 board = board.Board(STARTING_STATE_FEN, computer_color)
 temp_self = board.usermoves
-ai = AI(computer_color, board, temp_self)
+temp_self2 = board.aimoves
+ai = AI(computer_color, board, temp_self, temp_self2)
 
 while True:
-
+    print(board.usermoves)
+    print("\n")
+    print(board.aimoves)
     if board.turn == human_color:
         move_allowed = False
         while not move_allowed:
