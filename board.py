@@ -111,8 +111,8 @@ class Board:
             self.player_pieces =  [[1,1], [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [2,3], [8,3], [1,4], [3,4], [5,4], [7,4], [9,4]]
             self.aipieces = [[1,10], [2,10], [3,10], [4,10], [5,10], [6,10], [7,10], [8,10], [9,10], [2,8], [8,8], [1,7], [3,7], [5,7], [7,7], [9,7]]
         
-        self.userthreats = []
-        self.aithreats = []
+        self.userthreats =set()
+        self.aithreats =set()
         self.ai_threat()
         self.user_threat()
 
@@ -147,6 +147,7 @@ class Board:
     
     
     def ai_threat(self):
+        self.userthreats.clear()
         temp = []
         for rank in range(1, 10+1):
             for file in range(1, 9+1):
@@ -154,9 +155,10 @@ class Board:
                     if (i[0] == file and i[1] == rank):
                         temp += Board.generate_pseudo_valid_moves_nocan(self.state, file, rank)
         for z in temp:
-            self.userthreats.append([z.target[0],z.target[1]])
+            self.userthreats.add((z.target[0],z.target[1]))
 
     def user_threat(self):
+        self.aithreats.clear()
         temp = []
         for rank in range(1, 10+1):
             for file in range(1, 9+1):
@@ -164,7 +166,7 @@ class Board:
                     if (i[0] == file and i[1] == rank):
                         temp += Board.generate_pseudo_valid_moves_nocan(self.state, file, rank)
         for z in temp:
-            self.aithreats.append([z.target[0],z.target[1]])
+            self.aithreats.add((z.target[0],z.target[1]))
 
     def updateBoardFromMove(self, m: Move):
         # Swap places in list    
@@ -509,9 +511,9 @@ class Board:
     @staticmethod
     def generate_pseudo_valid_moves_order(board, file, rank, color, usermove):
         """
-        Given a board state and a single piece location, generate a list of pseudo-legal moves
-        :@param file {int} vertical line on board, range={1..9}
-        :@param rank {int} horizontal line on board, range={1..10}
+        Given a board state and a single piece location, generate a list of pseudo-legal moves 
+        :@param file {int} vertical line on board, range={1..9} 
+        :@param rank {int} horizontal line on board, range={1..10} 
 
         Static function allowing to generate moves for the potential board states
 
@@ -617,14 +619,17 @@ class Board:
 
 
                 # 4. Create a move and add to list
+            
                 if not disqualified and capture == False:
-                    for i in usermove:
-                        if (new_file == i[0] and new_rank == i[1]):
-                            move = Move((file, rank), (new_file, new_rank), capture, -1)
-                            break
-                        else: 
-                            move = Move((file, rank), (new_file, new_rank), capture, 5)
+                    # Move in line of fire
+                    if (new_file, new_rank) in usermove:
+                        move = Move((file, rank), (new_file, new_rank), capture, -1)
+                        break
+                    else:
+                        move = Move((file, rank), (new_file, new_rank), capture, 5)
+
                     moves.append(move)
+
                 elif not disqualified and capture == True:
                     captured_piece = board[(new_rank-1)*9 + (new_file-1)] 
                     captured_piece = PIECE_MAPPING[captured_piece.upper()]
@@ -642,7 +647,7 @@ class Board:
                 # the loop should continue until an obstruction is encountered or end of board reached
                 should_advance = any_dist
 
-        moves.sort(key=lambda s: s.score, reverse=True)
+        
 
         return moves
     

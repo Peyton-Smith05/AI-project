@@ -104,8 +104,10 @@ class AI:
                         side = 'b'
                     else: side = 'w'
                     moves += Board.generate_pseudo_valid_moves_order(board, file, rank, side, self.aithreats)
+                    
 
         # Keep track of best seen move
+        moves.sort(key=lambda s: s.score, reverse=True)
         best_move = None
         if turn == MAX: best_score = -math.inf
         else: best_score = math.inf
