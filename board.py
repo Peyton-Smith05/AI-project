@@ -148,6 +148,7 @@ class Board:
     
     def ai_threat(self):
         temp = []
+        self.userthreats.clear()
         for rank in range(1, 10+1):
             for file in range(1, 9+1):
                 for i in self.player_pieces:
@@ -158,6 +159,7 @@ class Board:
 
     def user_threat(self):
         temp = []
+        self.aithreats.clear()
         for rank in range(1, 10+1):
             for file in range(1, 9+1):
                 for i in self.aipieces:
@@ -168,7 +170,7 @@ class Board:
 
     def updateBoardFromMove(self, m: Move):
         # Swap places in list    
-       
+        
         if (self.turn != self.computer_color):
             for i in self.player_pieces:
                 if (i[0] == m.start[0] and i[1] == m.start[1]):
