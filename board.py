@@ -111,8 +111,13 @@ class Board:
             self.player_pieces =  [[1,1], [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [2,3], [8,3], [1,4], [3,4], [5,4], [7,4], [9,4]]
             self.aipieces = [[1,10], [2,10], [3,10], [4,10], [5,10], [6,10], [7,10], [8,10], [9,10], [2,8], [8,8], [1,7], [3,7], [5,7], [7,7], [9,7]]
         
+<<<<<<< HEAD
         self.userthreats =set()
         self.aithreats =set()
+=======
+        self.usermoves = []
+        self.aimoves = []
+>>>>>>> parent of f674471 (Update for clarity)
         self.ai_threat()
         self.user_threat()
 
@@ -155,7 +160,11 @@ class Board:
                     if (i[0] == file and i[1] == rank):
                         temp += Board.generate_pseudo_valid_moves_nocan(self.state, file, rank)
         for z in temp:
+<<<<<<< HEAD
             self.userthreats.add((z.target[0],z.target[1]))
+=======
+            self.usermoves.append([z.target[0],z.target[1]])
+>>>>>>> parent of f674471 (Update for clarity)
 
     def user_threat(self):
         self.aithreats.clear()
@@ -166,7 +175,11 @@ class Board:
                     if (i[0] == file and i[1] == rank):
                         temp += Board.generate_pseudo_valid_moves_nocan(self.state, file, rank)
         for z in temp:
+<<<<<<< HEAD
             self.aithreats.add((z.target[0],z.target[1]))
+=======
+            self.aimoves.append([z.target[0],z.target[1]])
+>>>>>>> parent of f674471 (Update for clarity)
 
     def updateBoardFromMove(self, m: Move):
         # Swap places in list    
