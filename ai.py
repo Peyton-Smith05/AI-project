@@ -103,7 +103,7 @@ class AI:
                     if self.side == 'w':
                         side = 'b'
                     else: side = 'w'
-<<<<<<< HEAD
+
                     moves += Board.generate_pseudo_valid_moves_order(board, file, rank, side, self.aithreats)
 
         # Keep track of best seen move
