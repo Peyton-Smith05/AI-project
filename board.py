@@ -115,7 +115,9 @@ class Board:
         self.aithreats = []
         self.ai_threat()
         self.user_threat()
-
+    
+    
+    
     def __str__(self):
         count = 0
         board_str = "\n          BLACK              "
@@ -177,16 +179,21 @@ class Board:
                     i[0] = m.target[0]
                     i[1] = m.target[1]
                     break
-                elif (i[0] == m.target[0] and i[1] == m.target[1]):
-                    self.player_pieces.remove(i)
+            for x in self.aipieces:
+                if (x[0] == m.target[0] and x[1] == m.target[1]):
+                    self.aipieces.remove(x)
+                    break
         else:
             for i in self.aipieces:
                 if (i[0] == m.start[0] and i[1] == m.start[1]):
                     i[0] = m.target[0]
                     i[1] = m.target[1]
                     break
-                elif (i[0] == m.target[0] and i[1] == m.target[1]):
-                    self.aipieces.remove(i)
+            for x in self.player_pieces:
+                if (x[0] == m.target[0] and x[1] == m.target[1]):
+                    self.player_pieces.remove(x)
+                    break
+                
 
         
 
