@@ -35,15 +35,15 @@ WEIGHTS = [1, 1, 1]
 
 class AI:
 
-    def __init__(self, side, board, usermove, aimove):
+    def __init__(self, side, board, userthreats, aithreats):
         self.side = side
         if side == "b":
             self.positions = set(BLACK_START_POSITIONS)
         else:
             self.positions = set(WHITE_START_POSITIONS)
         self.board = board
-        self.usermove = usermove
-        self.aimove = aimove
+        self.userthreats = userthreats
+        self.aithreats = aithreats
 
     def perform_move(self):
         """
@@ -97,13 +97,13 @@ class AI:
                     continue
                 # AI's piece and AI's turn
                 elif self.is_mine(piece) and turn == MAX:
-                    moves += Board.generate_pseudo_valid_moves_order(board, file, rank, self.side, self.usermove)
+                    moves += Board.generate_pseudo_valid_moves_order(board, file, rank, self.side, self.userthreats)
                 # Opponent's piece and Opponent's turn
                 elif not self.is_mine(piece) and turn == MIN:
                     if self.side == 'w':
                         side = 'b'
                     else: side = 'w'
-                    moves += Board.generate_pseudo_valid_moves_order(board, file, rank, side, self.aimove)
+                    moves += Board.generate_pseudo_valid_moves_order(board, file, rank, side, self.aithreats)
 
         # Keep track of best seen move
         best_move = None
