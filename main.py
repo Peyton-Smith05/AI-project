@@ -51,12 +51,11 @@ else:
     computer_color = 'w'
 
 board = board.Board(STARTING_STATE_FEN, computer_color)
-temp_self = board.userthreats
-temp_self2 = board.aithreats
-ai = AI(computer_color, board, temp_self, temp_self2)
+
+ai = AI(computer_color, board)
 
 while True:
-    print(temp_self)
+   
     if board.turn == human_color:
         move_allowed = False
         while not move_allowed:
