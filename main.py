@@ -56,7 +56,7 @@ temp_self2 = board.aithreats
 ai = AI(computer_color, board, temp_self, temp_self2)
 
 while True:
-    print(board.player_pieces)
+    
     if board.turn == human_color:
         move_allowed = False
         while not move_allowed:
