@@ -25,7 +25,7 @@ WHITE_START_POSITIONS = [(1,10), (2,10), (3,10), (4,10), (5,10), (6,10), (7,10),
 # Minimax configuration
 MAX = 1
 MIN = -1
-MAX_DEPTH = 5
+MAX_DEPTH = 3
 
 # Weights for evaluation heurstics
 # [material, mobility, threats]
@@ -123,7 +123,7 @@ class AI:
                 if turn == MAX: new_turn = MIN
                 else: new_turn = MAX
 
-                _, score = self.minimax2(simulated_board, max_depth, depth+1, alpha, beta, new_turn)
+                _, score = self.minimax(simulated_board, max_depth, depth+1, alpha, beta, new_turn)
 
             # Update best move
             if (turn == MAX and score > best_score): 

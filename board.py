@@ -113,6 +113,8 @@ class Board:
         
         self.usermoves = []
         self.aimoves = []
+        self.ai_threat()
+        self.user_threat()
 
     def __str__(self):
         count = 0
