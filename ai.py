@@ -100,7 +100,10 @@ class AI:
                     moves += Board.generate_pseudo_valid_moves_order(board, file, rank, self.side, self.usermove)
                 # Opponent's piece and Opponent's turn
                 elif not self.is_mine(piece) and turn == MIN:
-                    moves += Board.generate_pseudo_valid_moves_order(board, file, rank, self.side, self.aimove)
+                    if self.side == 'w':
+                        side = 'b'
+                    else: side = 'w'
+                    moves += Board.generate_pseudo_valid_moves_order(board, file, rank, side, self.aimove)
 
         # Keep track of best seen move
         best_move = None
