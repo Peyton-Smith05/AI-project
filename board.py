@@ -642,7 +642,7 @@ class Board:
                 # the loop should continue until an obstruction is encountered or end of board reached
                 should_advance = any_dist
 
-        moves.sort(key=lambda s: s.score, reverse=True)
+        
 
         return moves
     
