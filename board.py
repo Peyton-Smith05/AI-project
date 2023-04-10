@@ -486,19 +486,23 @@ class Board:
                     # Cannon has encountered a piece it can use as a 'platform'
                     # Check if there is an opponent piece on the axis past the 'platform'
                     
-                    if piece == Cannon and not cannon_platform:
+                    if piece == Cannon and not cannon_platform and not occupied:
                         disqualified = True
-                    
-                    if piece == Cannon and cannon_platform:
-                        disqualified = False
-
+                        halt = False
+                           
                     if piece == Cannon and occupied:
                         # Cannon platform encountered
                         if not cannon_platform:
                             cannon_platform = True
                             halt = False
-                           
-                        
+                        # Enemy piece encountered after platform, can capture
+                        elif cannon_platform and not friendly:
+                            disqualified = False
+                            capture = True
+                            halt = True
+                    # Cannon cannot move past obstruction, only capture
+                    elif piece == Cannon and cannon_platform:
+                        disqualified = True
                     
 
                     if disqualified:
@@ -632,7 +636,7 @@ class Board:
                         moves.append(move)
                     else:
                         move = Move((file, rank), (new_file, new_rank), capture, 5)
-                        moves.append(move)
+                        moves.append(move) 
                     
                     
                 elif not disqualified and capture == True:
