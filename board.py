@@ -115,7 +115,7 @@ class Board:
         self.userthreats = set()
         # Positions on the board that is under fire from the AI pieces (Player will take into account these threats for move ordering)
         self.aithreats = set()
-        # Populate both self.userthreats and self.aithreats on init as the first move will make use of them
+        # Populate both self.userthreats and self.aithreats on init 
         self.ai_threat()
         self.user_threat()
     
@@ -150,7 +150,7 @@ class Board:
         return board_str
     
     
-    # Get every position on the board that is under fire from the player pieces
+    # Get every position on the board that is under fire from the player pieces (threats that the AI have to be aware of)
     def ai_threat(self):
         temp = []
         self.userthreats.clear()
@@ -162,7 +162,7 @@ class Board:
         for move in temp:
             self.userthreats.add((move.target[0],move.target[1]))
 
-    # Get every position on the board that is under fire from the AI pieces
+    # Get every position on the board that is under fire from the AI pieces (threats that the player(user) have to be aware of)
     def user_threat(self):
         temp = []
         self.aithreats.clear()
