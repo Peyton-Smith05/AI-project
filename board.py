@@ -111,8 +111,11 @@ class Board:
             self.player_pieces =  [[1,1], [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [2,3], [8,3], [1,4], [3,4], [5,4], [7,4], [9,4]]
             self.aipieces = [[1,10], [2,10], [3,10], [4,10], [5,10], [6,10], [7,10], [8,10], [9,10], [2,8], [8,8], [1,7], [3,7], [5,7], [7,7], [9,7]]
         
+        # Positions on the board that is under fire from the player pieces (AI will take into account these threats during minimax)
         self.userthreats = set()
+        # Positions on the board that is under fire from the AI pieces (Player will take into account these threats during minimax)
         self.aithreats = set()
+        # Populate both self.userthreats and self.aithreats on init as the first move will make use of them
         self.ai_threat()
         self.user_threat()
     
@@ -147,32 +150,34 @@ class Board:
         return board_str
     
     
-    
+    # Get every position on the board that is under fire from the player pieces
     def ai_threat(self):
         temp = []
         self.userthreats.clear()
         for rank in range(1, 10+1):
             for file in range(1, 9+1):
-                for i in self.player_pieces:
-                    if (i[0] == file and i[1] == rank):
-                        temp += Board.generate_pseudo_valid_moves_nocan(self.state, file, rank)
-        for z in temp:
-            self.userthreats.add((z.target[0],z.target[1]))
+                for pieces in self.player_pieces:
+                    if (pieces[0] == file and pieces[1] == rank):
+                        temp += Board.generate_pseudo_valid_moves_threats(self.state, file, rank)
+        for move in temp:
+            self.userthreats.add((move.target[0],move.target[1]))
 
+    # Get every position on the board that is under fire from the AI pieces
     def user_threat(self):
         temp = []
         self.aithreats.clear()
         for rank in range(1, 10+1):
             for file in range(1, 9+1):
-                for i in self.aipieces:
-                    if (i[0] == file and i[1] == rank):
-                        temp += Board.generate_pseudo_valid_moves_nocan(self.state, file, rank)
-        for z in temp:
-            self.aithreats.add((z.target[0],z.target[1]))
+                for pieces in self.aipieces:
+                    if (pieces[0] == file and pieces[1] == rank):
+                        temp += Board.generate_pseudo_valid_moves_threats(self.state, file, rank)
+        for move in temp:
+            self.aithreats.add((move.target[0],move.target[1]))
 
     def updateBoardFromMove(self, m: Move):
-        # Swap places in list    
-        
+          
+        # Update positions of ai pieces or player pieces
+
         if (self.turn != self.computer_color):
             for i in self.player_pieces:
                 if (i[0] == m.start[0] and i[1] == m.start[1]):
@@ -195,17 +200,16 @@ class Board:
                     break
                 
 
-        
+        # Swap places in list 
 
         self.state[(m.target[1]-1)*9 + (m.target[0]-1)] = self.state[(m.start[1]-1)*9 + (m.start[0]-1)]
         self.state[(m.start[1]-1)*9 + (m.start[0]-1)] = '+'
 
+        # Update aithreats or userthreats list
+
         if (self.turn != self.computer_color):
-
             self.ai_threat()
-
         else:
-
             self.user_threat()
 
         # Update Turn
@@ -400,8 +404,9 @@ class Board:
 
         return moves
     
+    # To generate all positions that are being targeted by either the ai pieces or the player pieces 
     @staticmethod
-    def generate_pseudo_valid_moves_nocan(board, file, rank):
+    def generate_pseudo_valid_moves_threats(board, file, rank):
         """
         Given a board state and a single piece location, generate a list of pseudo-legal moves
         :@param file {int} vertical line on board, range={1..9}
@@ -518,6 +523,9 @@ class Board:
 
         return moves
 
+    # Given a board state and a single piece location, generate a list of pseudo-legal moves but with move score given
+    # @param usermove refers to either self.userthreats or self.aithreats (These two threats are passed to the AI on init and passed to this function as parameters when called by the AI minimax function)
+    # @param color refers to which side is playing to determine soldier value
     @staticmethod
     def generate_pseudo_valid_moves_order(board, file, rank, color, usermove):
         """
@@ -629,6 +637,9 @@ class Board:
 
 
                 # 4. Create a move and add to list
+
+                # Moves that enter the enemy line of fire are given a lower score while moves that avoid enemy line of fire are given a higher score
+                
                 if not disqualified and capture == False:
                     if (new_file, new_rank) in usermove:
                         move = Move((file, rank), (new_file, new_rank), capture, -1)
@@ -637,7 +648,7 @@ class Board:
                         move = Move((file, rank), (new_file, new_rank), capture, 5)
                         moves.append(move) 
                     
-                    
+                # Move that capture the enemy high value piece with a low value piece is given a higher score that just normal capturing move   
                 elif not disqualified and capture == True:
                     captured_piece = board[(new_rank-1)*9 + (new_file-1)] 
                     captured_piece = PIECE_MAPPING[captured_piece.upper()]

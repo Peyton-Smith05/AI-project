@@ -42,7 +42,9 @@ class AI:
         else:
             self.positions = set(WHITE_START_POSITIONS)
         self.board = board
+        # This value refers to self.userthreats in board.py
         self.usermove = usermove
+        # This value refers to self.aithreats in board.py
         self.aimove = aimove
 
     def perform_move(self):
@@ -107,12 +109,13 @@ class AI:
                     moves += Board.generate_pseudo_valid_moves_order(board, file, rank, side, self.aimove)
 
         # Keep track of best seen move
+        # TODO: Order the moves list here and implement alpha-beta in loop below
         moves.sort(key=lambda s: s.score, reverse=True)
         best_move = None
         if turn == MAX: best_score = -math.inf
         else: best_score = math.inf
 
-        # TODO: Order the moves list here and implement alpha-beta in loop below
+        
 
         
 

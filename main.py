@@ -51,9 +51,9 @@ else:
     computer_color = 'w'
 
 board = board.Board(STARTING_STATE_FEN, computer_color)
-temp_self = board.userthreats
-temp_self2 = board.aithreats
-ai = AI(computer_color, board, temp_self, temp_self2)
+board_userthreats = board.userthreats
+board_aithreats = board.aithreats
+ai = AI(computer_color, board, board_userthreats, board_aithreats)
 
 while True:
     
