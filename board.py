@@ -111,9 +111,9 @@ class Board:
             self.player_pieces =  [[1,1], [2,1], [3,1], [4,1], [5,1], [6,1], [7,1], [8,1], [9,1], [2,3], [8,3], [1,4], [3,4], [5,4], [7,4], [9,4]]
             self.aipieces = [[1,10], [2,10], [3,10], [4,10], [5,10], [6,10], [7,10], [8,10], [9,10], [2,8], [8,8], [1,7], [3,7], [5,7], [7,7], [9,7]]
         
-        # Positions on the board that is under fire from the player pieces (AI will take into account these threats during minimax)
+        # Positions on the board that is under fire from the player pieces (AI will take into account these threats for move ordering)
         self.userthreats = set()
-        # Positions on the board that is under fire from the AI pieces (Player will take into account these threats during minimax)
+        # Positions on the board that is under fire from the AI pieces (Player will take into account these threats for move ordering)
         self.aithreats = set()
         # Populate both self.userthreats and self.aithreats on init as the first move will make use of them
         self.ai_threat()
