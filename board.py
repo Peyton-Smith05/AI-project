@@ -115,7 +115,7 @@ class Board:
         self.userthreats = set()
         # Positions on the board that is under fire from the AI pieces (Player will take into account these threats for move ordering)
         self.aithreats = set()
-        # Populate both self.userthreats and self.aithreats on init 
+        # Populate both self.userthreats and self.aithreats on init based on intial aipieces and player_pieces positions
         self.ai_threat()
         self.user_threat()
     
