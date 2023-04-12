@@ -25,7 +25,7 @@ WHITE_START_POSITIONS = [(1,10), (2,10), (3,10), (4,10), (5,10), (6,10), (7,10),
 # Minimax configuration
 MAX = 1
 MIN = -1
-MAX_DEPTH = 3
+MAX_DEPTH = 4
 
 # Weights for evaluation heurstics
 # [material, mobility, threats]
@@ -35,13 +35,17 @@ WEIGHTS = [1, 1, 1]
 
 class AI:
 
-    def __init__(self, side, board):
+    def __init__(self, side, board, usermove, aimove):
         self.side = side
         if side == "b":
             self.positions = set(BLACK_START_POSITIONS)
         else:
             self.positions = set(WHITE_START_POSITIONS)
         self.board = board
+        # This value refers to self.userthreats in board.py
+        self.usermove = usermove
+        # This value refers to self.aithreats in board.py
+        self.aimove = aimove
 
     def perform_move(self):
         """
@@ -56,7 +60,8 @@ class AI:
         self.moves_considered = 0
 
         # Call minimax to find best move
-        best_move, best_score = self.minimax(self.board.state, MAX_DEPTH, 1, MAX)
+        best_move, best_score = self.minimax(self.board.state, MAX_DEPTH, 1, -math.inf, math.inf, MAX)
+        
         # Update piece positions
         self.update_positions(best_move.start, best_move.target)
 
@@ -65,7 +70,9 @@ class AI:
 
         return best_move, best_score, time_taken
 
-    def minimax(self, board, max_depth, depth, turn):
+    
+
+    def minimax(self, board, max_depth, depth, alpha, beta, turn):
         """
         Implementation of the vanilla minimax algorithm
 
@@ -92,17 +99,25 @@ class AI:
                     continue
                 # AI's piece and AI's turn
                 elif self.is_mine(piece) and turn == MAX:
-                    moves += Board.generate_pseudo_valid_moves(board, file, rank)
+                    moves += Board.generate_pseudo_valid_moves_order(board, file, rank, self.side, self.usermove)
                 # Opponent's piece and Opponent's turn
                 elif not self.is_mine(piece) and turn == MIN:
-                    moves += Board.generate_pseudo_valid_moves(board, file, rank)
+                    if self.side == 'w':
+                        side = 'b'
+                    else: side = 'w'
+
+                    moves += Board.generate_pseudo_valid_moves_order(board, file, rank, side, self.aimove)
 
         # Keep track of best seen move
+        # TODO: Order the moves list here and implement alpha-beta in loop below
+        moves.sort(key=lambda s: s.score, reverse=True)
         best_move = None
         if turn == MAX: best_score = -math.inf
         else: best_score = math.inf
 
-        # TODO: Order the moves list here and implement alpha-beta in loop below
+        
+
+        
 
         for move in moves:
             simulated_board = Board.simulate_move(board, move)
@@ -116,16 +131,31 @@ class AI:
                 if turn == MAX: new_turn = MIN
                 else: new_turn = MAX
 
-                _, score = self.minimax(simulated_board, max_depth, depth+1, new_turn)
+                _, score = self.minimax(simulated_board, max_depth, depth+1, alpha, beta, new_turn)
 
             # Update best move
-            if (turn == MAX and score > best_score) or (turn == MIN and score < best_score):
+            if (turn == MAX and score > best_score): 
                 best_score = score
                 best_move = move
+                alpha = max(alpha, best_score)
+                if (beta <= alpha):
+                    break
+
+            elif (turn == MIN and score < best_score):
+                best_score = score
+                best_move = move
+                beta = min(beta, best_score)
+                if (beta <= alpha):
+                    break
 
         return best_move, best_score
+    
+    def order_moves(self, moves):
 
 
+
+        return 0
+    
     def update_positions(self, old_position, new_position=None):
         """
         Update the AI's list of current piece positions
