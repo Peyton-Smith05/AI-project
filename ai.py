@@ -68,9 +68,6 @@ class AI:
     def minimax(self, board, max_depth, depth, turn):
         """
         Implementation of the vanilla minimax algorithm
-
-        TODO: Implement Alpha-Beta Pruning (see below)
-        TODO: Implement ordering to optimise Alpha-Beta Pruning (see below)
         TODO: Optional extension: Implement multi-threading
 
         :@param board {[char]} the hypothetical state of the board
@@ -92,10 +89,20 @@ class AI:
                     continue
                 # AI's piece and AI's turn
                 elif self.is_mine(piece) and turn == MAX:
-                    moves += Board.generate_pseudo_valid_moves(board, file, rank)
+                    # If we are at top-level of game tree, i.e. considering the best immediate moves,
+                    # all moves generated must be fully valid
+                    if (turn == 1):
+                        moves += self.board.generateValidMoves(file, rank)
+                    else:
+                        moves += Board.generate_pseudo_valid_moves(board, file, rank)
                 # Opponent's piece and Opponent's turn
                 elif not self.is_mine(piece) and turn == MIN:
-                    moves += Board.generate_pseudo_valid_moves(board, file, rank)
+                    # If we are at top-level of game tree, i.e. considering the best immediate moves,
+                    # all moves generated must be fully valid
+                    if (turn == 1):
+                        moves += self.board.generateValidMoves(file, rank)
+                    else:
+                        moves += Board.generate_pseudo_valid_moves(board, file, rank)
 
         # Keep track of best seen move
         best_move = None
