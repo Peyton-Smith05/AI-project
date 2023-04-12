@@ -99,14 +99,24 @@ class AI:
                     continue
                 # AI's piece and AI's turn
                 elif self.is_mine(piece) and turn == MAX:
-                    moves += Board.generate_pseudo_valid_moves_order(board, file, rank, self.side, self.usermove)
+                    # If we are on the top level of game tree, i.e. considering
+                    # the immediate next move, all moves must be fully legal
+                    if (depth == 1):
+                        moves += self.board.generateValidMoves(file, rank)
+                    else:
+                        moves += Board.generate_pseudo_valid_moves_order(board, file, rank, self.side, self.usermove)
                 # Opponent's piece and Opponent's turn
                 elif not self.is_mine(piece) and turn == MIN:
                     if self.side == 'w':
                         side = 'b'
                     else: side = 'w'
 
-                    moves += Board.generate_pseudo_valid_moves_order(board, file, rank, side, self.aimove)
+                    # If we are on the top level of game tree, i.e. considering
+                    # the immediate next move, all moves must be fully legal
+                    if (depth == 1):
+                        moves += self.board.generateValidMoves(file, rank)
+                    else:
+                        moves += Board.generate_pseudo_valid_moves_order(board, file, rank, side, self.aimove)
 
         # Keep track of best seen move
         # TODO: Order the moves list here and implement alpha-beta in loop below
