@@ -667,11 +667,7 @@ class Board:
                 # the loop should continue until an obstruction is encountered or end of board reached
                 should_advance = any_dist
 
-         # 2. Check for two kings facing each other directly
-        moves = list(filter(lambda move: not Board.kings_facing(board.simulateMove(move)), moves))
-
-        # 3. Check for check 
-        moves = list(filter(lambda move: not Board.is_check(board.simulateMove(move), red_side), moves))
+        
 
         return moves
     
