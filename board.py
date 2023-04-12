@@ -118,7 +118,7 @@ class Board:
         # Populate both self.userthreats and self.aithreats on init based on intial aipieces and player_pieces positions
         self.ai_threat()
         self.user_threat()
-    
+        self.currentmoves = []
     
     
     def __str__(self):
@@ -290,6 +290,7 @@ class Board:
         # 3. Check for check 
         moves = list(filter(lambda move: not Board.is_check(self.simulateMove(move), red_side), moves))
 
+        self.currentmoves = moves
         return moves
 
     @staticmethod
@@ -666,7 +667,11 @@ class Board:
                 # the loop should continue until an obstruction is encountered or end of board reached
                 should_advance = any_dist
 
-        
+         # 2. Check for two kings facing each other directly
+        moves = list(filter(lambda move: not Board.kings_facing(board.simulateMove(move)), moves))
+
+        # 3. Check for check 
+        moves = list(filter(lambda move: not Board.is_check(board.simulateMove(move), red_side), moves))
 
         return moves
     

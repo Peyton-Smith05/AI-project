@@ -25,7 +25,7 @@ WHITE_START_POSITIONS = [(1,10), (2,10), (3,10), (4,10), (5,10), (6,10), (7,10),
 # Minimax configuration
 MAX = 1
 MIN = -1
-MAX_DEPTH = 4
+MAX_DEPTH = 3
 
 # Weights for evaluation heurstics
 # [material, mobility, threats]
