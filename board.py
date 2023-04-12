@@ -282,7 +282,7 @@ class Board:
             return []
 
         # 1. Generate pseudo-legal moves
-        moves = Board.generate_pseudo_valid_moves(self.state, file, rank)
+        moves = Board.generate_pseudo_valid_moves_order(self.state, file, rank, self.turn, self.aithreats)
         
         # 2. Check for two kings facing each other directly
         moves = list(filter(lambda move: not Board.kings_facing(self.simulateMove(move)), moves))
