@@ -158,7 +158,7 @@ class Board:
             for file in range(1, 9+1):
                 for pieces in self.player_pieces:
                     if (pieces[0] == file and pieces[1] == rank):
-                        temp += Board.generate_pseudo_valid_moves_threats(self.state, file, rank)
+                        temp += Board.generate_pseudo_valid_moves(self.state, file, rank)
         for move in temp:
             self.userthreats.add((move.target[0],move.target[1]))
 
@@ -170,7 +170,7 @@ class Board:
             for file in range(1, 9+1):
                 for pieces in self.aipieces:
                     if (pieces[0] == file and pieces[1] == rank):
-                        temp += Board.generate_pseudo_valid_moves_threats(self.state, file, rank)
+                        temp += Board.generate_pseudo_valid_moves(self.state, file, rank)
         for move in temp:
             self.aithreats.add((move.target[0],move.target[1]))
 
@@ -223,7 +223,7 @@ class Board:
     def checkForEndGame(self):
         # TODO: Add other conditions for game end
         # Check if King is at check
-        for (side, name) in [(True, "White"), (False, "black")]:
+        for (side, name) in [(True, "White"), (False, "Black")]:
             if (Board.is_check(self.state, side)):
                 # Check if King can escape check
                 position = Board.find_king(self.state, side)
@@ -340,8 +340,8 @@ class Board:
             # This loop allows to model moves of any distance along an axis
             while should_advance and not halt:
 
-                # For all pieces, apart for Horse and Elephant this will run once
-                # (Horse and Elephant have a two-stage move)
+                # For all pieces, apart for Horse this will run once
+                # (Horse has a two-stage move)
                 for vector in vector_sequence:
 
                     # 1. Compute resulting new position
@@ -371,6 +371,9 @@ class Board:
                     elif occupied:
                         disqualified = True
                         halt = True
+                    # Unoccupied and not disqualified, so not a capture move
+                    else:
+                        capture = False
 
                     # Special Case: Cannon Capture
                     # If halted, and not reached end of board, 
@@ -404,125 +407,6 @@ class Board:
 
         return moves
     
-    # To generate all positions that are being targeted by either the ai pieces or the player pieces 
-    @staticmethod
-    def generate_pseudo_valid_moves_threats(board, file, rank):
-        """
-        Given a board state and a single piece location, generate a list of pseudo-legal moves
-        :@param file {int} vertical line on board, range={1..9}
-        :@param rank {int} horizontal line on board, range={1..10}
-
-        Static function allowing to generate moves for the potential board states
-
-        :@return moves {[Move]} list of pseudo-legal moves
-        """
-        
-        # List of pseudo-legal moves
-        moves = []
-
-        # Identify piece occupying given location
-        unknown_piece = board[(rank-1)*9 + (file-1)] 
-        piece = PIECE_MAPPING[unknown_piece.upper()]
-
-        # Get the movement specification of the given piece 
-        vectors, any_dist, area = piece.get_move_vectors(file, rank, unknown_piece.islower()) 
-        
-        # Check the bounding area for the given piece
-        if area is not None: 
-            min_file, max_file = area[0] 
-            min_rank, max_rank = area[1] 
-        else:
-            min_file, max_file = 1, 9
-            min_rank, max_rank = 1, 10
-
-        # Generate pseudo-legal moves
-        for vector_sequence in vectors:
-
-            new_file, new_rank = file, rank
-
-            # Whether the last considered move should be disqualified
-            disqualified = False
-            # Whether the current sequence of move should be stopped
-            # e.g. If way obstructed, do not consider the remaining positions
-            halt = False
-
-            capture = False
-            cannon_platform = False
-            should_advance = True
-            
-            # This loop allows to model moves of any distance along an axis
-            while should_advance and not halt:
-
-                # For all pieces, apart for Horse and Elephant this will run once
-                # (Horse and Elephant have a two-stage move)
-                for vector in vector_sequence:
-
-                    # 1. Compute resulting new position
-                    new_file += vector[0]
-                    new_rank += vector[1]
-                    
-                    # 2. Check if new location is within bounds
-                    if not (min_file <= new_file <= max_file) or not (min_rank <= new_rank <= max_rank):
-                        # Outside the bounding area, check next option
-                        disqualified = True
-                        halt = True
-                        break
-
-                    
-                    # 3. Check if new location is occupied
-                    occupied, friendly = Board.is_occupied(board, new_file, new_rank, unknown_piece)
-
-                    # Occupied by friendly piece
-                    if occupied and friendly:
-                        disqualified = True
-                        halt = True
-                    # Occupied by opponent piece, is a single-step move, and piece is not Cannon
-                    elif occupied and vector == vector_sequence[-1] and piece != Cannon:
-                        disqualified = False
-                        capture = True
-                        halt = True
-                    # Occupied by opponent piece and is the first-step of a two-step move
-                    elif occupied:
-                        disqualified = True
-                        halt = True
-
-                    # Special Case: Cannon Capture
-                    # If halted, and not reached end of board, 
-                    # Cannon has encountered a piece it can use as a 'platform'
-                    # Check if there is an opponent piece on the axis past the 'platform'
-                    
-                    if piece == Cannon and not cannon_platform:
-                    
-                        disqualified = True
-
-                    if piece == Cannon and cannon_platform:
-                        disqualified = False
-                        
-
-                    if piece == Cannon and occupied:
-                        # Cannon platform encountered
-                        if not cannon_platform:
-                            cannon_platform = True
-                            halt = False
-
-
-                       
-                    
-
-                    if disqualified:
-                        break
-
-                # 4. Create a move and add to list
-                if not disqualified:
-                    move = Move((file, rank), (new_file, new_rank), capture)
-                    moves.append(move)
-
-                # If the given piece can move any distance along an axis (e.g. Cannon or Rook)
-                # the loop should continue until an obstruction is encountered or end of board reached
-                should_advance = any_dist
-
-        return moves
-
     # Given a board state and a single piece location, generate a list of pseudo-legal moves but with move score given
     # @param usermove refers to either self.userthreats or self.aithreats (These two threats are passed to the AI on init and passed to this function as parameters when called by the AI minimax function)
     # @param color refers to which side is playing to determine soldier value
@@ -583,7 +467,7 @@ class Board:
             while should_advance and not halt:
 
                 # For all pieces, apart for Horse and Elephant this will run once
-                # (Horse and Elephant have a two-stage move)
+                # (Horse and Elephant has a two-stage move)
                 for vector in vector_sequence:
 
                     # 1. Compute resulting new position
@@ -609,10 +493,13 @@ class Board:
                         disqualified = False
                         capture = True
                         halt = True
-                    # Occupied by opponent piece and is the first-step of a two-step move
+                    # Occupied by opponent piece and is the first-step of a two-step Horse move
                     elif occupied:
                         disqualified = True
                         halt = True
+                    # Unoccupied and not disqualified, so not a capture move
+                    else:
+                        capture = False
 
                     # Special Case: Cannon Capture
                     # If halted, and not reached end of board, 
@@ -649,7 +536,7 @@ class Board:
                         moves.append(move) 
                     
                 # Move that capture the enemy high value piece with a low value piece is given a higher score that just normal capturing move   
-                elif not disqualified and capture == True:
+                elif not disqualified and occupied and capture == True:
                     captured_piece = board[(new_rank-1)*9 + (new_file-1)] 
                     captured_piece = PIECE_MAPPING[captured_piece.upper()]
                     captured_val = captured_piece.get_value(file, rank, red_side)
@@ -665,8 +552,6 @@ class Board:
                 # If the given piece can move any distance along an axis (e.g. Cannon or Rook)
                 # the loop should continue until an obstruction is encountered or end of board reached
                 should_advance = any_dist
-
-        
 
         return moves
     
