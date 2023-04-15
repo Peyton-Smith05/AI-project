@@ -75,7 +75,8 @@ class Advisor(Piece):
 
 class Elephant(Piece):
     # Diagonal movements
-    move_vectors = [[(2,2)],[(2,-2)],[(-2,2)],[(-2,-2)]]
+    move_vectors = [[(1,1),(1,1)], [(1,-1),(1,-1)],
+                    [(-1,1),(-1,1)], [(-1,-1),(-1,-1)]]
     value = 2
 
     @staticmethod

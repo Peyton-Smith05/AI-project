@@ -340,8 +340,8 @@ class Board:
             # This loop allows to model moves of any distance along an axis
             while should_advance and not halt:
 
-                # For all pieces, apart for Horse this will run once
-                # (Horse has a two-stage move)
+                # For all pieces, apart for Horse and Elephant this will run once
+                # (Horse and Elephant have a two-stage move)
                 for vector in vector_sequence:
 
                     # 1. Compute resulting new position
@@ -367,7 +367,7 @@ class Board:
                         disqualified = False
                         capture = True
                         halt = True
-                    # Occupied by opponent piece and is the first-step of a two-step Horse move
+                    # Occupied by opponent piece and is the first-step of a two-step move
                     elif occupied:
                         disqualified = True
                         halt = True
@@ -453,8 +453,8 @@ class Board:
             # This loop allows to model moves of any distance along an axis
             while should_advance and not halt:
 
-                # For all pieces, apart for Horse this will run once
-                # (Horse has a two-stage move)
+                # For all pieces, apart for Horse and Elephant this will run once
+                # (Horse and Elephant have a two-stage move)
                 for vector in vector_sequence:
 
                     # 1. Compute resulting new position
@@ -481,7 +481,7 @@ class Board:
                         disqualified = False
                         capture = True
                         halt = True
-                    # Occupied by opponent piece and is the first-step of a two-step Horse move
+                    # Occupied by opponent piece and is the first-step of a two-step move
                     elif occupied:
                         disqualified = True
                         halt = True
@@ -582,8 +582,8 @@ class Board:
             # This loop allows to model moves of any distance along an axis
             while should_advance and not halt:
 
-                # For all pieces, apart for Horse this will run once
-                # (Horse has a two-stage move)
+                # For all pieces, apart for Horse and Elephant this will run once
+                # (Horse and Elephant have a two-stage move)
                 for vector in vector_sequence:
 
                     # 1. Compute resulting new position
@@ -609,7 +609,7 @@ class Board:
                         disqualified = False
                         capture = True
                         halt = True
-                    # Occupied by opponent piece and is the first-step of a two-step Horse move
+                    # Occupied by opponent piece and is the first-step of a two-step move
                     elif occupied:
                         disqualified = True
                         halt = True
