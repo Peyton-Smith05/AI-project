@@ -31,7 +31,7 @@ MAX_DEPTH = 4
 # [material, mobility, threats]
 # currently initialised to be of equal importance
 # TODO: Perform Reinforcement Learning to find optimum weightage
-WEIGHTS = [1, 1, 1]
+WEIGHTS = [7, 1, 2]
 
 class AI:
 
