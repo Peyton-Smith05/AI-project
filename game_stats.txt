@@ -1,0 +1,12 @@
+Number of Moves: 	4
+Total Time: 	71.40265226364136
+Time/Move: 	17.85066306591034
+List of moves: 
+Move from (1, 1) to (1, 2)
+Score: 	0.0
+Move from (8, 3) to (8, 7)
+Score: 	11.0
+Move from (1, 2) to (6, 2)
+Score: 	11.0
+Move from (8, 1) to (7, 3)
+Score: 	13.0

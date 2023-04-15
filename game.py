@@ -215,7 +215,6 @@ screen.blit(dumbo_image, dumbo_pos)
 game_pieces.draw(screen)
 valid_move_dots.draw(screen)
 
-
 screen.blit(move_text_surface, move_text_pos)
 screen.blit(score_text_surface, score_text_pos)
 screen.blit(turn_text_surface, turn_text_pos)
@@ -223,12 +222,29 @@ screen.blit(time_text_surface, time_text_pos)
 screen.blit(comment_surface, comment_pos)
 
 pygame.display.flip()
+ai_time_rec = []
+num_moves = 0
+
+move_data = []
 
 while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+
+            total_time = sum(ai_time_rec)
+            av_time = total_time / len(ai_time_rec)
+
+            text_file = open("game_stats.txt", 'w')
+            text_file.write('Number of Moves: \t' + str(len(ai_time_rec)) + '\n')
+            text_file.write('Total Time: \t' + str(total_time) + '\n')
+            text_file.write('Time/Move: \t' + str(av_time) + '\n')
+
+            text_file.write('List of moves: \n')
+            for move in move_data:
+                text_file.write(move)
+
             running = False
         elif event.type == pygame.MOUSEBUTTONUP and player_color == board.turn:
 
@@ -253,7 +269,7 @@ while running:
                     selected_piece = move
             if selected_piece is not None:
                 board.updateBoardFromMove(selected_piece.move)
-                turn_text = board.turn
+                turn_text = 'Turn:' + board.turn
                 turn_text_surface = font.render(turn_text, True, (0, 0, 0))
                 game_pieces.empty()
 
@@ -275,9 +291,8 @@ while running:
                     moves = board.generateValidMoves((ind % 9) + 1, (ind // 9) + 1)
                     valid_move_dots.empty()
                     for move in moves:
-                        new_dot = Dot(COORDINATE_MAP[((move.target[1]-1) * 9) + (move.target[0]-1)], move)
+                        new_dot = Dot(COORDINATE_MAP[((move.target[1] - 1) * 9) + (move.target[0] - 1)], move)
                         valid_move_dots.add(new_dot)
-
 
 
         elif event.type == AI_MOVE and board.turn == computer_color:
@@ -291,13 +306,18 @@ while running:
             
             """
             comment_surface = font.render('Interesting... Let me think about this', True, (0, 0, 0))
-            screen.blit(comment_surface, comment_pos)
+            screen.blit(comment_surface, (comment_pos[0], comment_pos[1] + 20))
             pygame.display.flip()
             move, score, time = ai.perform_move()
             board.updateBoardFromMove(move)
             turn_text = 'Turn: ' + board.turn
             turn_text_surface = font.render(turn_text, True, (0, 0, 0))
             game_pieces.empty()
+            ai_time_rec.append(time)
+            num_moves += 1
+
+            move_str = str(move) + '\nScore: \t' + str(score) + '\n'
+            move_data.append(move_str)
 
             piece_lst = initializePiecesFromBoard(board)
 
@@ -311,7 +331,7 @@ while running:
             time_text = 'Time taken: ' + str(time)
             move_text = str(move)
             score_text = 'Score: ' + str(score)
-            turn_text = board.turn
+            turn_text = 'Turn: ' + board.turn
             time_text_surface = font.render(time_text, True, (0, 0, 0))
             move_text_surface = font.render(move_text, True, (0, 0, 0))
             score_text_surface = font.render(score_text, True, (0, 0, 0))
@@ -329,9 +349,21 @@ while running:
     game_pieces.draw(screen)
     valid_move_dots.draw(screen)
 
-    # end, player = board.checkForEndGame()
-    # if end:
-    #     break
+    end, player = board.checkForEndGame()
+    if end:
+        total_time = sum(ai_time_rec)
+        av_time = total_time / len(ai_time_rec)
+
+        text_file = open("game_stats.txt", 'w')
+        text_file.write('Number of Moves: \t' + str(len(ai_time_rec)) + '\n')
+        text_file.write('Total Time: \t' + str(total_time) + '\n')
+        text_file.write('Time/Move: \t' + str(av_time) + '\n')
+
+        text_file.write('List of moves: \n')
+        for move in move_data:
+            text_file.write(move)
+
+        break
 
     screen.blit(move_text_surface, move_text_pos)
     screen.blit(score_text_surface, score_text_pos)
