@@ -160,12 +160,6 @@ class AI:
 
         return best_move, best_score
     
-    def order_moves(self, moves):
-
-
-
-        return 0
-    
     def update_positions(self, old_position, new_position=None):
         """
         Update the AI's list of current piece positions

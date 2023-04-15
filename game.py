@@ -227,6 +227,8 @@ num_moves = 0
 
 move_data = []
 
+end = False
+
 while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
@@ -280,6 +282,8 @@ while running:
                 valid_move_dots.empty()
                 ai_move_event = pygame.event.Event(AI_MOVE)
                 pygame.event.post(ai_move_event)
+
+                end, player = board.checkForEndGame()
 
             else:
                 for piece in game_pieces:
@@ -337,6 +341,8 @@ while running:
             score_text_surface = font.render(score_text, True, (0, 0, 0))
             turn_text_surface = font.render(turn_text, True, (0, 0, 0))
 
+            end, player = board.checkForEndGame()
+
     # fill the screen with a color to wipe away anything from last frame
     screen.fill(BACKGROUND_COLOR)
     screen.blit(background, (0, 0))
@@ -349,7 +355,7 @@ while running:
     game_pieces.draw(screen)
     valid_move_dots.draw(screen)
 
-    end, player = board.checkForEndGame()
+    
     if end:
         total_time = sum(ai_time_rec)
         av_time = total_time / len(ai_time_rec)

@@ -22,11 +22,12 @@ FEN Notation:
 """
 
 # Proprietary code
-import random
 from move import Move
 from piece import *
 
 # Packages and libraries
+import random
+from time import time
 from copy import deepcopy
 
 """
@@ -225,16 +226,32 @@ class Board:
         # Check if King is at check
         for (side, name) in [(True, "White"), (False, "Black")]:
             if (Board.is_check(self.state, side)):
-                # Check if King can escape check
-                position = Board.find_king(self.state, side)
-                moves = Board.generate_pseudo_valid_moves(self.state, position[0], position[1])
+                # Check if King can escape check or any other piece take the threatening opponent piece
+                moves = []
+                for rank in range(1, 10+1):
+                    for file in range(1, 9+1):
+                        piece = self.state[(rank-1)*9 + (file-1)]
+
+                        # No piece at this positon
+                        if piece == "+":
+                            continue
+                        # Red/White piece
+                        elif piece.islower() and side:
+                            moves += self.generateValidMoves(file, rank)
+                        # Black piece
+                        elif piece.isupper() and not side:
+                            moves += self.generateValidMoves(file, rank)
+                        else:
+                            continue
+
+                moves = list(filter(lambda move: not Board.is_check(self.simulateMove(move), side), moves))
                 # Checkmate
-                print()
                 if len(moves) == 0:
                     print(name, " IS IN CHECKMATE. END OF THE GAME")
                     return True, name
                 else:
-                    print(name, " IS IN CHECK")
+                    print(name, " IS IN CHECK ", time())
+        
         return False, ""
             
     
@@ -340,8 +357,9 @@ class Board:
             # This loop allows to model moves of any distance along an axis
             while should_advance and not halt:
 
-                # For all pieces, apart for Horse this will run once
-                # (Horse has a two-stage move)
+                # For all pieces, apart for Horse and Elephant this will run once
+                # (Horse and Elephant has a two-stage move)
+                vector_index = 0
                 for vector in vector_sequence:
 
                     # 1. Compute resulting new position
@@ -363,7 +381,7 @@ class Board:
                         disqualified = True
                         halt = True
                     # Occupied by opponent piece, is a single-step move, and piece is not Cannon
-                    elif occupied and vector == vector_sequence[-1] and piece != Cannon:
+                    elif occupied and len(vector_sequence) == (vector_index+1) and piece != Cannon:
                         disqualified = False
                         capture = True
                         halt = True
@@ -395,6 +413,9 @@ class Board:
 
                     if disqualified:
                         break
+
+                    # Await the next move in the vector sequence
+                    vector_index += 1
 
                 # 4. Create a move and add to list
                 if not disqualified:
@@ -468,6 +489,7 @@ class Board:
 
                 # For all pieces, apart for Horse and Elephant this will run once
                 # (Horse and Elephant has a two-stage move)
+                vector_index = 0
                 for vector in vector_sequence:
 
                     # 1. Compute resulting new position
@@ -489,7 +511,7 @@ class Board:
                         disqualified = True
                         halt = True
                     # Occupied by opponent piece, is a single-step move, and piece is not Cannon
-                    elif occupied and vector == vector_sequence[-1] and piece != Cannon:
+                    elif occupied and len(vector_sequence) == (vector_index+1) and piece != Cannon:
                         disqualified = False
                         capture = True
                         halt = True
@@ -521,6 +543,9 @@ class Board:
 
                     if disqualified:
                         break
+
+                    # Await the next move in the vector sequence
+                    vector_index += 1
 
 
                 # 4. Create a move and add to list
