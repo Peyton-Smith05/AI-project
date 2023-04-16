@@ -1,24 +1,84 @@
-Number of Moves: 	10
-Total Time: 	66.75073909759521
-Time/Move: 	6.675073909759521
+Number of Moves: 	40
+Total Time: 	607.0139183998108
+Time/Move: 	15.17534795999527
 List of moves: 
-Move from (9, 1) to (8, 1)
+Move from (2, 8) to (2, 6)
+Score: 	16.0
+Move from (2, 6) to (1, 6)
+Score: 	20.0
+Move from (1, 6) to (5, 6)
+Score: 	24.0
+Move from (5, 6) to (9, 6)
+Score: 	24.0
+Move from (9, 6) to (3, 6)
+Score: 	19.5
+Move from (8, 8) to (8, 5)
+Score: 	12.0
+Move from (4, 10) to (5, 9)
+Score: 	5.5
+Move from (8, 5) to (8, 9)
+Score: 	7.0
+Move from (3, 6) to (4, 6)
+Score: 	6.0
+Move from (8, 9) to (8, 5)
+Score: 	2.0
+Move from (8, 5) to (8, 4)
+Score: 	0.0
+Move from (4, 6) to (4, 3)
+Score: 	6.0
+Move from (8, 4) to (8, 9)
+Score: 	18.5
+Move from (4, 3) to (8, 3)
+Score: 	-11.0
+Move from (8, 9) to (9, 9)
+Score: 	-20.0
+Move from (9, 9) to (9, 4)
+Score: 	0.0
+Move from (9, 4) to (7, 4)
+Score: 	-10.0
+Move from (1, 10) to (1, 8)
+Score: 	-21.0
+Move from (9, 10) to (8, 10)
+Score: 	-2.5
+Move from (1, 8) to (2, 8)
+Score: 	17.5
+Move from (7, 4) to (3, 4)
+Score: 	21.5
+Move from (3, 4) to (4, 4)
+Score: 	22.5
+Move from (4, 4) to (3, 4)
+Score: 	12.5
+Move from (3, 4) to (3, 2)
+Score: 	19.5
+Move from (3, 2) to (4, 2)
+Score: 	11.5
+Move from (5, 9) to (4, 10)
+Score: 	0.0
+Move from (2, 8) to (6, 8)
+Score: 	7.5
+Move from (6, 8) to (6, 6)
+Score: 	5.5
+Move from (7, 10) to (5, 8)
 Score: 	-1.5
-Move from (8, 3) to (7, 3)
-Score: 	10.5
-Move from (1, 1) to (2, 1)
-Score: 	30.0
-Move from (7, 3) to (7, 6)
-Score: 	38.0
-Move from (8, 1) to (8, 10)
-Score: 	57.0
-Move from (8, 10) to (7, 10)
-Score: 	65.0
-Move from (7, 10) to (7, 9)
-Score: 	78.0
-Move from (2, 3) to (8, 3)
-Score: 	77.0
-Move from (2, 1) to (2, 8)
-Score: 	77.0
-Move from (2, 8) to (3, 8)
-Score: 	176.0
+Move from (4, 10) to (5, 9)
+Score: 	-17.5
+Move from (5, 9) to (6, 8)
+Score: 	-20.5
+Move from (7, 7) to (7, 6)
+Score: 	-13.5
+Move from (5, 10) to (5, 9)
+Score: 	-39.0
+Move from (2, 10) to (1, 8)
+Score: 	-23.5
+Move from (4, 2) to (2, 2)
+Score: 	-18.5
+Move from (5, 9) to (6, 9)
+Score: 	-40.0
+Move from (6, 6) to (4, 6)
+Score: 	-22.5
+Move from (4, 6) to (6, 6)
+Score: 	-43.0
+Move from (8, 10) to (8, 1)
+Score: 	-34.0
+Move from (2, 2) to (2, 5)
+Score: 	-26.5

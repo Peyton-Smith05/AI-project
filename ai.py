@@ -25,7 +25,7 @@ WHITE_START_POSITIONS = [(1,10), (2,10), (3,10), (4,10), (5,10), (6,10), (7,10),
 # Minimax configuration
 MAX = 1
 MIN = -1
-MAX_DEPTH = 4
+MAX_DEPTH = 3
 
 # Weights for evaluation heurstics
 # [material, mobility, threats]
@@ -120,7 +120,7 @@ class AI:
 
         # Keep track of best seen move
         # TODO: Order the moves list here and implement alpha-beta in loop below
-        moves.sort(key=lambda s: s.score, reverse=True)
+        # moves.sort(key=lambda s: s.score, reverse=True)
         best_move = None
         if turn == MAX: best_score = -math.inf
         else: best_score = math.inf
@@ -147,16 +147,16 @@ class AI:
             if (turn == MAX and score > best_score): 
                 best_score = score
                 best_move = move
-                alpha = max(alpha, best_score)
-                if (beta <= alpha):
-                    break
+                # alpha = max(alpha, best_score)
+                # if (beta <= alpha):
+                #     break
 
             elif (turn == MIN and score < best_score):
                 best_score = score
                 best_move = move
-                beta = min(beta, best_score)
-                if (beta <= alpha):
-                    break
+                # beta = min(beta, best_score)
+                # if (beta <= alpha):
+                #     break
 
         return best_move, best_score
     
