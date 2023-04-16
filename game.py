@@ -178,7 +178,7 @@ game_pieces = pygame.sprite.Group()
 board = board.Board(STARTING_STATE_FEN, computer_color)
 board_userthreats = board.userthreats
 board_aithreats = board.aithreats
-ai = ai.AI(computer_color, board, board_userthreats, board_aithreats)
+ai = ai.AI(computer_color, board, board_userthreats, board_aithreats, 4)
 
 # Text Initialization
 turn_text_pos = (750, 375)

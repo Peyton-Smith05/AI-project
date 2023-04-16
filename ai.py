@@ -10,13 +10,6 @@ class AI
 @:var side {char} side the AI plays on; b for black side, w for white side
 @:var board: {Board} reference to current Board object
 @:var positions: {[(int, int)]} current positions of the pieces of the AI
-
-TODO: Implement Evaluation Heuristic Function
-TODO: Implement Vanilla Minimax
-TODO: Make AI Use Minimax to Make a Move
-TODO: Implement Ordering Heuristic
-TODO: Implement Alpha-Beta Pruning
-TODO: Perform Reinforcement Learning to find Optimal Weightage for Evaluation Heuristics
 """
 
 BLACK_START_POSITIONS = [(1,1), (2,1), (3,1), (4,1), (5,1), (6,1), (7,1), (8,1), (9,1), (2,3), (8,3), (1,4), (3,4), (5,4), (7,4), (9,4)]
@@ -28,8 +21,6 @@ MIN = -1
 
 # Weights for evaluation heurstics
 # [material, mobility, threats]
-# currently initialised to be of equal importance
-# TODO: Perform Reinforcement Learning to find optimum weightage
 WEIGHTS = [7, 1, 2]
 
 class AI:
@@ -45,7 +36,7 @@ class AI:
         self.usermove = usermove
         # This value refers to self.aithreats in board.py
         self.aimove = aimove
-        # This value refers to deepness of minmax search
+        # This value refers to max depth of minmax search
         self.depth=depth
 
     def perform_move(self):
@@ -93,10 +84,6 @@ class AI:
         """
         Implementation of the vanilla minimax algorithm
 
-        TODO: Implement Alpha-Beta Pruning (see below)
-        TODO: Implement ordering to optimise Alpha-Beta Pruning (see below)
-        TODO: Optional extension: Implement multi-threading
-
         :@param board {[char]} the hypothetical state of the board
         :@param max_depth {int} maximum depth of recursion in the game tree
         :@param depth (int) current depth in the game tree
@@ -135,16 +122,10 @@ class AI:
                     else:
                         moves += Board.generate_pseudo_valid_moves_order(board, file, rank, side, self.aimove)
 
-        # Keep track of best seen move
-        # TODO: Order the moves list here and implement alpha-beta in loop below
         moves.sort(key=lambda s: s.score, reverse=True)
         best_move = None
         if turn == MAX: best_score = -math.inf
         else: best_score = math.inf
-
-        
-
-        
 
         for move in moves:
             simulated_board = Board.simulate_move(board, move)

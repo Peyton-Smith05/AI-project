@@ -72,7 +72,7 @@ else:
 board = board.Board(STARTING_STATE_FEN, computer_color)
 board_userthreats = board.userthreats
 board_aithreats = board.aithreats
-ai = AI(computer_color, board, board_userthreats, board_aithreats,3)
+ai = AI(computer_color, board, board_userthreats, board_aithreats, 4)
 
 while True:
     
