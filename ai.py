@@ -25,7 +25,6 @@ WHITE_START_POSITIONS = [(1,10), (2,10), (3,10), (4,10), (5,10), (6,10), (7,10),
 # Minimax configuration
 MAX = 1
 MIN = -1
-MAX_DEPTH = 4
 
 # Weights for evaluation heurstics
 # [material, mobility, threats]
@@ -35,7 +34,7 @@ WEIGHTS = [7, 1, 2]
 
 class AI:
 
-    def __init__(self, side, board, usermove, aimove):
+    def __init__(self, side, board, usermove, aimove, depth):
         self.side = side
         if side == "b":
             self.positions = set(BLACK_START_POSITIONS)
@@ -46,6 +45,8 @@ class AI:
         self.usermove = usermove
         # This value refers to self.aithreats in board.py
         self.aimove = aimove
+        # This value refers to deepness of minmax search
+        self.depth=depth
 
     def perform_move(self):
         """
@@ -60,7 +61,7 @@ class AI:
         self.moves_considered = 0
 
         # Call minimax to find best move
-        best_move, best_score = self.minimax(self.board.state, MAX_DEPTH, 1, -math.inf, math.inf, MAX)
+        best_move, best_score = self.minimax(self.board.state, self.depth, 1, -math.inf, math.inf, MAX)
         
         # Update piece positions
         self.update_positions(best_move.start, best_move.target)
@@ -70,7 +71,23 @@ class AI:
 
         return best_move, best_score, time_taken
 
-    
+    def simulate_move(self):
+        """
+        Make AI perform a move based on current state of the board
+
+        :@return best_move {Move} the most optimum move
+        :@return best_score {float} the score of the most optimum move
+        :@return time_taken {float} the time taken to compute a move in seconds
+        """
+        # Measure time taken to compute best move
+        start_time = time()
+        self.moves_considered = 0
+        # Call minimax to find best move
+        best_move, best_score = self.minimax(self.board.state, self.depth, 1, -math.inf, math.inf, MAX)
+        end_time = time()
+        time_taken = end_time - start_time
+
+        return best_move, best_score, time_taken
 
     def minimax(self, board, max_depth, depth, alpha, beta, turn):
         """

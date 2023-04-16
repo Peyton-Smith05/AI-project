@@ -2,12 +2,27 @@ import board
 import random 
 from move import Move
 from ai import AI
+from RL import RL
 
+import os
 from os import system, name
+import json
 
 STARTING_STATE_FEN = 'rheakaehr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RHEAKAEHR w - - 0 1'
 
+def save_dict_to_file(dictionary, filename):
+    with open(filename, 'w') as f:
+        json.dump(dictionary, f)
 
+def read_dict_from_file(filename):
+    if os.path.exists(filename):
+        with open(filename, 'r') as f:
+            dictionary = json.load(f)
+            print("MODEL LOADED")
+    else:
+        print("NO MODEL")
+        dictionary = {}
+    return dictionary
 # Helper function
 def getMoveFromString(start, target, board):
 
@@ -42,18 +57,22 @@ def clear_screen():
 
 
 computer_color = ''
+model_filename="dict.txt"
+model_dict=read_dict_from_file(model_filename)
+rlmodel=RL(model_dict)
 
 human_color = input("Playing as w or b? ")
 
 if human_color == 'w':
     computer_color = 'b'
+    rlmodel.revert_model()
 else:
     computer_color = 'w'
 
 board = board.Board(STARTING_STATE_FEN, computer_color)
 board_userthreats = board.userthreats
 board_aithreats = board.aithreats
-ai = AI(computer_color, board, board_userthreats, board_aithreats)
+ai = AI(computer_color, board, board_userthreats, board_aithreats,3)
 
 while True:
     
@@ -116,14 +135,21 @@ while True:
         if end == True:
             break
         print("AI computing move...")
-        move, score, time = ai.perform_move()
-        board.updateBoardFromMove(move)
+        move, reward, time= ai.simulate_move()
+        best_Q_move, score= rlmodel.compute_move(board,reward,move)
+        board.updateBoardFromMove(best_Q_move)
         clear_screen()
-        print("AI: ", move)
+        print("AI: ", best_Q_move)
         print("Time taken: ", time, " seconds")
         print("Moves combinations considered: ", ai.moves_considered)
         print("CURR SCORE ", score)
 
+if human_color == 'w':# revert model back to original position if human playe as white
+    rlmodel.revert_model()
+model_dict=rlmodel.return_model()
+if os.path.exists(model_filename):
+    os.remove(model_filename)
+save_dict_to_file(model_dict,model_filename)
 input('Press enter to exit the game')
     
     

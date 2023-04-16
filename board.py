@@ -150,6 +150,33 @@ class Board:
 
         return board_str
     
+    def str_positions(self):
+        count = 0
+        rank = 1
+        strr=""
+        for i in range(len(self.state)):
+            if count != 8:
+                strr+=self.state[i]
+                count += 1
+            else:
+                rank += 1
+                strr+=self.state[i]
+                count = 0
+        return strr    
+
+    def str_positions_board(self, board):
+        count = 0
+        rank = 1
+        strr=""
+        for i in range(len(board)):
+            if count != 8:
+                strr+=board[i]
+                count += 1
+            else:
+                rank += 1
+                strr+=board[i]
+                count = 0
+        return strr    
     
     # Get every position on the board that is under fire from the player pieces (threats that the AI have to be aware of)
     def ai_threat(self):
@@ -295,7 +322,7 @@ class Board:
         if self.turn == 'b' and red_side == True:
             return []
         
-        if self.turn == 'r' and red_side == False:
+        if self.turn == 'w' and red_side == False:
             return []
 
         # 1. Generate pseudo-legal moves
@@ -645,6 +672,8 @@ class Board:
                         return True
 
         return False
+
+
     
     
             

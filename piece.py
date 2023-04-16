@@ -48,7 +48,7 @@ class King(Piece):
     # Orthogonal movements
     move_vectors = [[(1,0)],[(-1,0)],[(0,1)],[(0,-1)]]
     # King's value is infinity, for this purposes an arbitrarily high value
-    value = 100000
+    value = 1000
 
     @staticmethod
     def get_move_vectors(file, rank, red_side):
